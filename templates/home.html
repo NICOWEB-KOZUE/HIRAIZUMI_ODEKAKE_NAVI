@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="{{ url_for('places') }}" method="get">
+  <h2 class="subtitle">どこから出かけますか？</h2>
+  <div class="departure">
+    <p class="home-origin"{% if stop %} aria-label="自宅、バス停は{{ stop }}"{% endif %}>
+      <input type="hidden" name="origin" value="home">
+      自宅{% if stop %}（<span class="stop-mark" aria-hidden="true">🚏</span>{{ stop }}）{% endif %}
+    </p>
+    <a class="change-stop" href="{{ url_for('stop') }}">乗るバス停を変える</a>
+  </div>
+
+  <h1 class="title">どこへ行きたいですか？</h1>
+  <div class="button-list">
+    {% for c in categories %}
+      <button class="big-button category-button" type="submit" name="category" value="{{ c.id }}">
+        <span class="icon">{{ c.icon }}</span><span>{{ c.label }}</span>
+      </button>
+    {% endfor %}
+  </div>
+</form>
+{% endblock %}

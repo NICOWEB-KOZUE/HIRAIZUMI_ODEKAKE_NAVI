@@ -1,0 +1,72 @@
+{
+  "checked_on": "2026-10-14",
+  "note": "出典と注意点は docs/timetable.md。access は最寄りの駅・バス停と、そこから歩く時間（分）",
+  "places": [
+    {"id": "hiraizumi_naika", "category": "hospital", "area": "town", "name": "ひらいずみ内科クリニック", "phone": "0191-34-1133",
+     "hours": {"mon": ["8:30-12:30", "14:00-17:30"], "tue": ["8:30-12:30", "14:00-17:30"], "wed": ["8:30-12:30"], "thu": ["8:30-12:30", "14:00-17:30"], "fri": ["8:30-12:30", "14:00-17:30"], "sat": ["8:30-12:30"]},
+     "closed_on_holidays": true, "access": {"stop": "平泉駅", "walk_minutes": 2}},
+    {"id": "hiraizumi_shika", "category": "hospital", "area": "town", "name": "平泉歯科診療所", "phone": "0191-46-2130",
+     "hours": {"mon": ["9:00-13:00", "14:30-18:30"], "tue": ["9:00-13:00", "14:30-18:30"], "wed": ["9:00-13:00"], "thu": ["9:00-13:00", "14:30-18:30"], "fri": ["9:00-13:00", "14:30-18:30"], "sat": ["9:00-13:00"]},
+     "closed_on_holidays": true, "access": {"stop": "平泉駅", "walk_minutes": 4}},
+    {"id": "sasaki_shika", "category": "hospital", "area": "town", "name": "ささき歯科", "phone": "0191-34-1876",
+     "hours": {"mon": ["9:00-12:00", "14:00-18:30"], "tue": ["9:00-12:00", "14:00-18:30"], "wed": ["9:00-12:00", "14:00-18:30"], "thu": ["9:00-13:00"], "fri": ["9:00-12:00", "14:00-18:30"], "sat": ["9:00-12:00", "14:00-17:00"]},
+     "closed_on_holidays": true, "access": {"stop": "平泉駅", "walk_minutes": 5}},
+    {"id": "asuka_yakkyoku", "category": "hospital", "area": "town", "name": "あすか薬局", "phone": "0191-34-1150",
+     "hours": {"mon": ["8:30-18:00"], "tue": ["8:30-18:00"], "wed": ["8:30-17:00"], "thu": ["8:30-18:00"], "fri": ["8:30-18:00"], "sat": ["8:30-17:00"]},
+     "closed_on_holidays": true, "access": {"stop": "平泉駅", "walk_minutes": 2}},
+
+    {"id": "iwai_hospital", "category": "hospital", "area": "ichinoseki", "name": "磐井病院（一関）", "phone": "0191-23-3453",
+     "reception": {"days": ["mon", "tue", "wed", "thu", "fri"], "from": "7:45", "until": null, "note": "外来は予約制。予約時刻に合わせて行く"},
+     "closed_on_holidays": true, "access": {"stop": "磐井・南光病院", "walk_minutes": 0, "via": "一ノ関"}},
+    {"id": "iwate_hospital", "category": "hospital", "area": "ichinoseki", "name": "岩手病院（一関）", "phone": "0191-25-2221",
+     "reception": {"days": ["mon", "tue", "wed", "thu", "fri"], "from": "8:30", "until": "11:00"},
+     "closed_on_holidays": true, "access": {"stop": "岩手病院前", "walk_minutes": 2, "via": "一ノ関"}},
+    {"id": "isawa_hospital", "category": "hospital", "area": "mizusawa", "name": "胆沢病院（水沢）", "phone": "0197-24-4121",
+     "reception": {"days": ["mon", "tue", "wed", "thu", "fri"], "from": "8:30", "until": "11:00", "note": "小児科・婦人科・麻酔科以外の再来は予約制"},
+     "closed_on_holidays": true, "access": {"stop": "胆沢病院", "walk_minutes": 0, "via": "水沢"}},
+    {"id": "mizusawa_hospital", "category": "hospital", "area": "mizusawa", "name": "水沢病院（水沢）", "phone": "0197-25-3833",
+     "reception": {"days": ["mon", "tue", "wed", "thu", "fri"], "from": "7:30", "until": "11:30", "note": "初めての人は 8:30 から。水・木は 11:00 までの科あり"},
+     "closed_on_holidays": true, "access": {"stop": "水沢病院前", "walk_minutes": 0, "via": "水沢"}},
+
+    {"id": "area_ichinoseki_station", "category": "hospital", "area": "ichinoseki", "name": "一関駅周辺の医院", "access": {"stop": "一ノ関", "walk_minutes": null}},
+    {"id": "area_yamanome", "category": "hospital", "area": "ichinoseki", "name": "山目周辺の医院", "access": {"stop": "山目駅前", "walk_minutes": null, "note": "一関平泉線で山目駅前へ"}},
+    {"id": "area_mizusawa_station", "category": "hospital", "area": "mizusawa", "name": "水沢駅周辺の医院", "access": {"stop": "水沢", "walk_minutes": null}},
+
+    {"id": "joice", "category": "shopping", "area": "town", "name": "ジョイス 平泉店", "phone": "0191-46-3553",
+     "hours": {"mon": ["10:00-21:00"], "tue": ["10:00-21:00"], "wed": ["10:00-21:00"], "thu": ["10:00-21:00"], "fri": ["10:00-21:00"], "sat": ["10:00-21:00"], "sun": ["9:00-21:00"], "holiday": ["9:00-21:00"]},
+     "access": {"stop": "ジョイス", "walk_minutes": 0}},
+    {"id": "michinoeki", "category": "shopping", "area": "town", "name": "道の駅 平泉（産直）", "phone": "0191-48-4795",
+     "seasonal_hours": [
+       {"months": [4, 5, 6, 7, 8, 9, 10, 11], "shop": "9:00-18:00", "fast_food": "10:00-17:00", "breakfast": "6:00-8:30", "lunch": "11:00-16:00"},
+       {"months": [12, 1, 2, 3], "shop": "9:00-17:00", "fast_food": "11:00-16:00", "breakfast": "6:30-8:30", "lunch": "11:00-16:00"}
+     ],
+     "note": "ランチのラストオーダーは 15:30。休みの日は未確認",
+     "access": {"stop": "道の駅", "walk_minutes": 0}},
+
+    {"id": "town_office", "category": "town_office", "area": "town", "name": "平泉町役場", "phone": "0191-46-2111",
+     "hours": {"mon": ["8:30-17:15"], "tue": ["8:30-17:15"], "wed": ["8:30-17:15"], "thu": ["8:30-17:15"], "fri": ["8:30-17:15"]},
+     "closed_on_holidays": true, "access": {"stop": "役場", "walk_minutes": 0}},
+
+    {"id": "post_office", "category": "post_bank", "area": "town", "name": "平泉郵便局", "phone": "0191-46-2150",
+     "hours": {"mon": ["9:00-17:00"], "tue": ["9:00-17:00"], "wed": ["9:00-17:00"], "thu": ["9:00-17:00"], "fri": ["9:00-17:00"]},
+     "note": "貯金・保険窓口は 16:00 まで", "closed_on_holidays": true, "access": {"stop": "平泉駅", "walk_minutes": 6}},
+    {"id": "iwate_bank", "category": "post_bank", "area": "town", "name": "岩手銀行 平泉支店", "phone": "0191-46-2941",
+     "hours": {"mon": ["9:00-11:30", "12:30-15:00"], "tue": ["9:00-11:30", "12:30-15:00"], "wed": ["9:00-11:30", "12:30-15:00"], "thu": ["9:00-11:30", "12:30-15:00"], "fri": ["9:00-11:30", "12:30-15:00"]},
+     "closed_on_holidays": true, "access": {"stop": "平泉駅", "walk_minutes": 5}},
+
+    {"id": "yukyu_no_yu", "category": "onsen", "area": "town", "name": "悠久の湯 平泉温泉", "phone": "0191-34-1300",
+     "hours": {"mon": ["10:00-21:00"], "wed": ["10:00-21:00"], "thu": ["10:00-21:00"], "fri": ["10:00-21:00"], "sat": ["10:00-21:00"], "sun": ["10:00-21:00"]},
+     "note": "毎週火曜休み（祝日の場合は営業）", "access": {"stop": "町民温泉", "walk_minutes": 0}},
+
+    {"id": "hiraizumi_station", "category": "station", "area": "town", "name": "平泉駅", "access": {"stop": "平泉駅", "walk_minutes": 0}}
+  ],
+  "walk_from_station": {
+    "note": "平泉駅からコミュニティバスの町の中心のバス停まで、一般的な「徒歩○分」（分速80m）。出典は docs/timetable.md",
+    "minutes": {"役場": 5, "町民温泉": 10, "道の駅": 13, "ジョイス": 25}
+  },
+  "taxis": [
+    {"name": "県南タクシー 平泉営業所", "phone": "0191-46-2336"},
+    {"name": "一関タクシー 平泉営業所", "phone": "0191-46-2101"},
+    {"name": "一関平泉タクシー 中尊寺営業所", "phone": "0191-34-2155"}
+  ]
+}

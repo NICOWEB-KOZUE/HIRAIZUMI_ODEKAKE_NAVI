@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block back %}<a class="back-link" href="{{ url_for('when', origin=origin, place=place_id) }}">もどる</a>{% endblock %}
+
+{% macro leg_row(leg) %}
+  <li class="leg leg-{{ leg.kind }}">
+    <span class="leg-icon">{{ leg.icon }}</span>
+    <div class="leg-body">
+      {% if leg.kind == "ride" %}
+        <div class="leg-times">
+          <span class="time">{{ leg.dep | hhmm }}</span> {{ leg.from }}
+          <span class="arrow">→</span>
+          {% if leg.show_arr %}<span class="time">{{ leg.arr | hhmm }}</span> {% endif %}{{ leg.to }}
+        </div>
+        <div class="leg-line">{{ leg.line }}{% if leg.fare %}　{{ leg.fare }}円{% endif %}</div>
+        {% if leg.note %}<div class="leg-note">{{ leg.note }}</div>{% endif %}
+      {% else %}
+        <div class="leg-text">{{ leg.text }}</div>
+      {% endif %}
+    </div>
+  </li>
+{% endmacro %}
+
+{% block content %}
+<h1 class="title">利用できる移動手段</h1>
+<p class="lead">
+  <strong>{{ plan.place.name }}</strong><br>
+  {{ plan.date_label }} {{ plan.period_label }}／出発: {{ origin_label }}
+</p>
+
+{% for n in plan.notices %}
+  <p class="notice notice-warn">{{ n }}</p>
+{% endfor %}
+
+{% if plan.journey %}
+<section class="journey-card" aria-label="おでかけの道のり">
+  <h2 class="subtitle">おでかけの道のり</h2>
+  <div class="journey" data-journey data-depart="いっしょに出かけましょう"
+       data-arrive="{{ plan.place.name.split('（')[0] }}に着きました">
+    <div class="journey-line"></div>
+    {% for step in plan.journey %}
+      <div class="journey-step">
+        <span class="journey-icon">{{ step.icon }}</span>
+        <span class="journey-label">{{ step.label }}</span>
+      </div>
+    {% endfor %}
+    <div class="walker" aria-hidden="true">
+      <span class="bubble" hidden></span>
+      <span class="walker-dog">🐕</span>
+    </div>
+  </div>
+  <button type="button" class="replay-button" data-replay>もう一度見る</button>
+</section>
+{% endif %}
+
+{% if plan.candidates %}
+<h2 class="subtitle">乗り換え候補</h2>
+{% for c in plan.candidates %}
+  <article class="candidate {% if c.recommended %}recommended{% endif %}">
+    <h3 class="candidate-title">{{ c.label }}</h3>
+
+    {% for w in c.warnings %}<p class="notice notice-warn">⚠️ {{ w }}</p>{% endfor %}
+    {% if c.info %}<p class="notice notice-ok">✅ {{ c.info }}</p>{% endif %}
+
+    <div class="trip-part">
+      <h4 class="trip-heading">行き</h4>
+      <ol class="legs">{% for leg in c.go %}{{ leg_row(leg) }}{% endfor %}</ol>
+      <p class="fare">運賃: {{ c.fare_go }}</p>
+    </div>
+
+    {% if c.stay %}
+      <p class="stay">{{ plan.place.name.split('（')[0] }}にいられる時間: <strong>{{ c.stay }}</strong></p>
+    {% endif %}
+
+    {% if c.back %}
+    <div class="trip-part">
+      <h4 class="trip-heading">帰り</h4>
+      <ol class="legs">{% for leg in c.back %}{{ leg_row(leg) }}{% endfor %}</ol>
+      {% if c.back_note %}<p class="notice notice-info">{{ c.back_note }}</p>{% endif %}
+      {% if c.fare_back %}<p class="fare">運賃: {{ c.fare_back }}</p>{% endif %}
+    </div>
+    {% endif %}
+  </article>
+{% endfor %}
+<p class="hint">コミュニティバスの運賃は65歳以上の金額（200円）で計算しています</p>
+<p class="hint">歩く時間は、ふつうの「徒歩○分」の1.5倍（ゆっくり歩いた場合）で計算しています</p>
+{% endif %}
+
+<h2 class="subtitle">電話・時刻表</h2>
+<div class="transport-list">
+  {% for t in plan.transports %}
+    <section class="transport">
+      <h3 class="transport-name">{{ t.icon }} {{ t.name }}</h3>
+      {% if t.fare %}<p class="transport-fare">{{ t.fare }}</p>{% endif %}
+      {% if t.note %}<p class="transport-note">{{ t.note }}</p>{% endif %}
+      <div class="transport-actions">
+        {% for p in t.phones %}
+          <a class="action-button call" href="tel:{{ p.number }}">📞 電話する<small>{{ p.label }}</small></a>
+        {% endfor %}
+        {% if t.times %}
+          <a class="action-button times" href="{{ url_for('times', kind=t.times) }}">🕘 時刻を見る</a>
+        {% endif %}
+      </div>
+    </section>
+  {% endfor %}
+</div>
+
+<div class="quiet-area">
+  <a class="big-button" href="{{ url_for('index') }}"><span class="icon">🏠</span><span>最初の画面にもどる</span></a>
+</div>
+{% endblock %}

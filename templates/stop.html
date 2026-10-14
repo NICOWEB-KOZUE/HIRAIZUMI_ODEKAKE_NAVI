@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block back %}
+  {% if route %}<a class="back-link" href="{{ url_for('stop') }}">もどる</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1 class="title">いつも乗るバス停はどこですか？</h1>
+
+<section class="notice notice-info">
+  <p class="notice-text">{{ registration.message }}</p>
+  <a class="link-button" href="{{ registration.url }}" target="_blank" rel="noopener">利用者登録のしかたを見る</a>
+  <a class="big-button call-button" href="tel:{{ registration.phone }}">
+    <span class="icon">📞</span>
+    <span>町に電話して登録する<small>{{ registration.office }} {{ registration.phone }}</small></span>
+  </a>
+</section>
+
+{% if route %}
+  <h2 class="subtitle">{{ route.name }}のバス停</h2>
+  <form method="post" class="button-list">
+    <input type="hidden" name="mode" value="bus">
+    <input type="hidden" name="route_id" value="{{ route.id }}">
+    {% for stop_name in route.district_stops %}
+      <button class="big-button" type="submit" name="stop" value="{{ stop_name }}">
+        <span class="icon">🚏</span><span>{{ stop_name }}</span>
+      </button>
+    {% endfor %}
+  </form>
+{% else %}
+  <div class="button-list">
+    {% for r in routes %}
+      <a class="big-button" href="{{ url_for('stop', route=r.id) }}">
+        <span class="icon">🚌</span>
+        <span>{{ r.name }}<small>{{ r.districts | join('・') }}区</small></span>
+      </a>
+    {% endfor %}
+  </div>
+  <form method="post" class="quiet-area">
+    <button class="quiet-button" type="submit" name="mode" value="taxi">バスは使わない（タクシーで行く）</button>
+  </form>
+{% endif %}
+{% endblock %}
