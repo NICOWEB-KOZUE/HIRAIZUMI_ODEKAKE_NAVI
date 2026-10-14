@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
 {% block back %}
-  {% if route %}<a class="back-link" href="{{ url_for('stop') }}">もどる</a>{% endif %}
+  {% if route %}
+    <a class="back-link" href="{{ url_for('stop') }}">もどる</a>
+  {% elif has_settings %}
+    <a class="back-link" href="{{ url_for('index') }}">もどる</a>
+  {% endif %}
 {% endblock %}
 
 {% block content %}
-<h1 class="title">いつも乗るバス停はどこですか？</h1>
+<h1 class="title">どのバス停から乗りますか？</h1>
 
 <section class="notice notice-info">
   <p class="notice-text">{{ registration.message }}</p>

@@ -3,12 +3,10 @@
 {% block content %}
 <form action="{{ url_for('places') }}" method="get">
   <h2 class="subtitle">どこから出かけますか？</h2>
+  <input type="hidden" name="origin" value="home">
   <div class="departure">
-    <p class="home-origin"{% if stop %} aria-label="自宅、バス停は{{ stop }}"{% endif %}>
-      <input type="hidden" name="origin" value="home">
-      自宅{% if stop %}（<span class="stop-mark" aria-hidden="true">🚏</span>{{ stop }}）{% endif %}
-    </p>
-    <a class="change-stop" href="{{ url_for('stop') }}">乗るバス停を変える</a>
+    <p class="home-origin">{% if stop %}自宅（バス停：{{ stop }}）{% else %}自宅{% endif %}</p>
+    <a class="change-stop" href="{{ url_for('stop') }}">バス停を変更する</a>
   </div>
 
   <h1 class="title">どこへ行きたいですか？</h1>

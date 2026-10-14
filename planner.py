@@ -75,6 +75,21 @@ OUT_OPTIONS = {
 
 YAMANOME_FARE = 360
 
+# コミュニティバスの停留所 → 東磐交通一関線で一関駅から帰る区間
+# 時刻表の停留所名が違うときは、その名前を使う
+TOBAN_HOME_STOPS = {
+    "月舘": "toban_ichi_to_tsukidate",
+    "二反田": "toban_ichi_to_nitanda",
+    "滝の沢下": "toban_ichi_to_takinosawa",
+    "滝の沢上": "toban_ichi_to_takinosawa",
+    "須崎": "toban_ichi_to_suzaki",
+    "下平": "toban_ichi_to_suzaki",
+    "東松寺前": "toban_ichi_to_tomatsuji",
+    "赤伏": "toban_ichi_to_akabushi",
+    "山王": "toban_ichi_to_sanno",
+    "野田": "toban_ichi_to_noda",
+}
+
 
 def load_json(name):
     with open(DATA_DIR / name, encoding="utf-8") as f:
@@ -311,7 +326,7 @@ def open_check(place, d, arrive):
         if start <= arrive < end:
             return {"ok": True, "text": None}
     if arrive < ranges[0][0]:
-        return {"ok": False, "text": f"{name}は {to_hhmm(ranges[0][0])} からです。少し待つか、午後の便をおすすめします"}
+        return {"ok": True, "text": None}
     for (_, end), (start, _) in zip(ranges, ranges[1:]):
         if end <= arrive < start:
             return {"ok": False, "text": f"着く時刻（{to_hhmm(arrive)}）はお昼休みです。{to_hhmm(start)} から開きます"}
@@ -505,6 +520,49 @@ def last_bus_note(settings, d, back):
     return LAST_BUS_NOTE if is_last_home_bus(settings, d, back[-1]) else None
 
 
+def ichinoseki_back_parts(option):
+    """帰りのうち、一関に着くところまで。平泉へ戻る電車や路線バスは含めない"""
+    parts = []
+    for group in option["back"]:
+        if SEGMENTS[group[0]]["to"] in ("平泉", "平泉駅前"):
+            break
+        parts.append(group)
+    return parts
+
+
+def toban_return(settings, d, option, ready):
+    """一関駅から東磐交通で、自宅付近の停留所まで帰る便。乗れる中でいちばん遅く帰れる組み合わせ"""
+    seg_id = TOBAN_HOME_STOPS.get(settings.get("stop"))
+    if seg_id is None or option.get("yamanome"):
+        return None
+    buses = segment_rides(seg_id, d)
+    if not buses:
+        return None
+    parts = ichinoseki_back_parts(option)
+    if parts:
+        matched = []
+        for chain in all_chains(parts, d):
+            if chain[0]["dep"] < ready or chain[-1]["to"] not in ("一関駅前", "一関駅", "一ノ関"):
+                continue
+            usable = [b for b in buses if b["dep"] >= chain[-1]["arr"] + TRANSFER_MINUTES]
+            if usable:
+                matched.append(chain + [dict(usable[0])])
+        if not matched:
+            return None
+        back = max(matched, key=lambda chain: chain[0]["dep"])
+    else:
+        usable = [b for b in buses if b["dep"] >= ready + TRANSFER_MINUTES]
+        if not usable:
+            return None
+        back = [dict(usable[-1])]
+    notes = ["一関駅前から乗ります"]
+    home = settings.get("stop")
+    if home and home != back[-1]["to"]:
+        notes.append(f"停留所の名前は「{back[-1]['to']}」です")
+    back[-1]["note"] = "。".join(notes)
+    return back
+
+
 def choose_back(settings, d, option, ready, place):
     """帰りの便を選ぶ。家に帰るコミュニティバスに間に合う中で、いちばん遅い便にする"""
     chains = [c for c in all_chains(option["back"], d) if c[0]["dep"] >= ready]
@@ -562,6 +620,7 @@ def plan_out(settings, origin, place, d, period):
         elif walk is None:
             go.append(text_leg("🚶", f"{chain[-1]['to']}から医院までは、歩くかタクシー", "walk"))
 
+        trip_warnings = list(warnings)
         back, back_warnings = choose_back(settings, d, option, arrive_stop + MIN_STAY_OUT, place)
         warnings += back_warnings
         if back is None:
@@ -575,12 +634,27 @@ def plan_out(settings, origin, place, d, period):
         info = None
         if reception and reception["until"] and not late:
             info = f"受付に間に合います（受付は {to_hhmm(reception['until'])} まで。着くのは {to_hhmm(arrive)}）"
+        back_note = last_bus_note(settings, d, back)
+        toban_back = toban_return(settings, d, option, arrive_stop + MIN_STAY_OUT)
+        if toban_back and back_note == LAST_BUS_NOTE:
+            back_note = "コミュニティバスの帰りはこの1本だけです。もっとゆっくりするときは、路線バスで帰れます"
         candidates.append({
             "label": option["label"], "go": go, "back": back, "warnings": warnings, "info": info,
-            "back_note": last_bus_note(settings, d, back),
+            "back_note": back_note,
             "stay": duration_text(stay) if stay else None, "late": late,
             "fare_go": fare_summary(go), "fare_back": fare_summary(back),
         })
+        if toban_back:
+            toban_stay = toban_back[0]["dep"] - arrive_stop if toban_back[0]["kind"] == "ride" else None
+            by = option["label"].removesuffix("で行く")
+            return_by = "路線バス（東磐交通）" if by == "路線バス" else "路線バス"
+            candidates.append({
+                "label": f"{by}で行って、{return_by}で帰る",
+                "go": go, "back": toban_back, "warnings": trip_warnings, "info": info,
+                "back_note": None,
+                "stay": duration_text(toban_stay) if toban_stay else None, "late": late,
+                "fare_go": fare_summary(go), "fare_back": fare_summary(toban_back),
+            })
 
     if candidates and all(c.get("late") for c in candidates):
         candidates.insert(0, taxi_candidate(go_start, at_station, place, d, reception))
@@ -612,8 +686,10 @@ def taxi_candidate(go_start, at_station, place, d, reception):
 # ---------- 画面4に出すまとめ ----------
 
 def journey_icons(origin, settings, candidate, place, category):
-    if origin == "home":
-        steps = [{"icon": "🏠", "label": "自宅"}]
+    if origin == "home" and settings.get("stop"):
+        steps = [{"icon": "🚏", "label": settings["stop"]}]
+    elif origin == "home":
+        steps = [{"icon": "🏠", "label": "出発"}]
     else:
         steps = [{"icon": "📍", "label": origin}]
     names = {"🚌": "バス", "🚃": "JR", "🚕": "タクシー", "🚶": "歩く"}
@@ -657,6 +733,19 @@ def transports_for(place, d, settings):
             "fare": "胆沢病院まで310円", "note": "平日のみ",
             "phones": [{"label": "岩手県交通 胆江営業所", "number": "0197-35-2185"}], "times": "mizusawa_hospital",
         })
+    if place["area"] == "ichinoseki" or settings.get("route_id") in ("nagashima_east_west", "nagashima_north_south"):
+        items.append({
+            "icon": "🚌", "name": "路線バス（東磐交通 一関線）",
+            "fare": "一関駅から長島まで480円、月館まで660円",
+            "note": "平日のみ（土・日は運休）。一関駅と長島・須崎下平・東松寺前・赤伏・山王方面",
+            "phones": [{"label": "東磐交通", "number": "0191-47-3434"}], "times": "toban_ichinoseki",
+        })
+    items.append({
+        "icon": "🚌", "name": "路線バス（東磐交通 平泉・げいび渓線）",
+        "fare": "平泉駅前からげいび渓まで800円（道の駅平泉まで300円）",
+        "note": "観光向けの季節運行。2026年4月29日〜11月23日。火・水曜は原則運休",
+        "phones": [{"label": "東磐交通", "number": "0191-47-3434"}], "times": "geibikei",
+    })
     items.append({
         "icon": "🚕", "name": "タクシー", "fare": "運賃は会社に電話で確認", "note": None,
         "phones": [{"label": t["name"], "number": t["phone"]} for t in TAXIS], "times": None,

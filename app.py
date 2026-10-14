@@ -32,8 +32,8 @@ def save_settings(settings):
 
 
 def home_label(settings):
-    if settings.get("mode") == "bus":
-        return f"自宅（{settings['stop']}）"
+    if settings.get("mode") == "bus" and settings.get("stop"):
+        return f"自宅（バス停：{settings['stop']}）"
     return "自宅"
 
 
@@ -66,7 +66,8 @@ def stop():
 
     route = planner.find_route(request.args.get("route", ""))
     return render_template("stop.html", routes=planner.COMMUNITY["routes"], route=route,
-                           registration=planner.COMMUNITY["registration"])
+                           registration=planner.COMMUNITY["registration"],
+                           has_settings=load_settings() is not None)
 
 
 @app.route("/places")
@@ -153,6 +154,28 @@ TIMES_PAGES = {
     "mizusawa_hospital": {"title": "水沢駅から病院へのバス（水岩線）", "segments": [
         "bus_mizusawa_to_isawa", "bus_isawa_to_mizusawa",
         "bus_mizusawa_to_mizusawa_hospital", "bus_mizusawa_hospital_to_mizusawa"]},
+    "geibikei": {
+        "title": "路線バス 東磐交通 平泉・げいび渓線",
+        "note": "2026年4月29日〜11月23日。火・水曜は運休（5月5日・6日、8月11日、9月22日・23日、11月3日は運行）。8月13日〜16日は運休。みちのくあじさい園へは水上で降車",
+        "segments": [
+            "toban_hiraizumi_to_michinoeki", "toban_hiraizumi_to_nanamagari",
+            "toban_hiraizumi_to_minakami", "toban_hiraizumi_to_geibikei",
+            "toban_geibikei_to_hiraizumi", "toban_geibikei_to_michinoeki",
+            "toban_geibikei_to_nanamagari", "toban_geibikei_to_minakami"]},
+    "toban_ichinoseki": {
+        "title": "路線バス 東磐交通 一関線",
+        "note": "平日のみ（土・日は運休）。一関駅と長島方面。公式サイトの時刻表（平成26年3月15日改正）をもとにしています",
+        "segments": [
+            "toban_ichi_to_nagashima", "toban_nagashima_to_ichi",
+            "toban_ichi_to_suzaki", "toban_suzaki_to_ichi",
+            "toban_ichi_to_tomatsuji", "toban_tomatsuji_to_ichi",
+            "toban_ichi_to_akabushi", "toban_akabushi_to_ichi",
+            "toban_ichi_to_sanno", "toban_sanno_to_ichi",
+            "toban_ichi_to_noda", "toban_noda_to_ichi",
+            "toban_ichi_to_takinosawa", "toban_takinosawa_to_ichi",
+            "toban_ichi_to_nitanda", "toban_nitanda_to_ichi",
+            "toban_ichi_to_tsukidate", "toban_tsukidate_to_ichi",
+            "toban_ichi_to_hakoshi", "toban_hakoshi_to_ichi"]},
 }
 
 
@@ -167,9 +190,10 @@ def times(kind):
         note = "平日のみ" if seg["days"] == "weekday" else None
         if seg.get("weekday_only_first"):
             note = f"はじめの{seg['weekday_only_first']}本は土・日・祝日は運休"
-        tables.append({"title": f"{seg['from']} → {seg['to']}", "sub": seg["name"], "note": note,
+        sub = seg["name"] + (f"　{seg['fare']}円" if seg.get("fare") else "")
+        tables.append({"title": f"{seg['from']} → {seg['to']}", "sub": sub, "note": note,
                        "headers": [f"{seg['from']} 発", f"{seg['to']} 着"], "rows": seg["times"]})
-    return render_template("times.html", title=page["title"], tables=tables, note=None)
+    return render_template("times.html", title=page["title"], tables=tables, note=page.get("note"))
 
 
 if __name__ == "__main__":
