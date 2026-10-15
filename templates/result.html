@@ -60,7 +60,7 @@
     <h3 class="candidate-title">{{ c.label }}</h3>
 
     {% for w in c.warnings %}<p class="notice notice-warn">⚠️ {{ w }}</p>{% endfor %}
-    {% if c.info %}<p class="notice notice-ok">✅ {{ c.info }}</p>{% endif %}
+    {% if c.info %}<p class="notice notice-ok">{{ c.info }}</p>{% endif %}
 
     <div class="trip-part">
       <h4 class="trip-heading">行き</h4>
@@ -75,8 +75,9 @@
     {% if c.back %}
     <div class="trip-part">
       <h4 class="trip-heading">帰り</h4>
-      <ol class="legs">{% for leg in c.back %}{{ leg_row(leg) }}{% endfor %}</ol>
+      {% for w in c.back_warnings %}<p class="notice notice-warn">⚠️ {{ w }}</p>{% endfor %}
       {% if c.back_note %}<p class="notice notice-info">{{ c.back_note }}</p>{% endif %}
+      <ol class="legs">{% for leg in c.back %}{{ leg_row(leg) }}{% endfor %}</ol>
       {% if c.fare_back %}<p class="fare">運賃: {{ c.fare_back }}</p>{% endif %}
     </div>
     {% endif %}
@@ -86,6 +87,7 @@
 <p class="hint">歩く時間は、ふつうの「徒歩○分」の1.5倍（ゆっくり歩いた場合）で計算しています</p>
 {% endif %}
 
+{% if plan.transports %}
 <h2 class="subtitle">電話・時刻表</h2>
 <div class="transport-list">
   {% for t in plan.transports %}
@@ -104,6 +106,7 @@
     </section>
   {% endfor %}
 </div>
+{% endif %}
 
 <div class="quiet-area">
   <a class="big-button" href="{{ url_for('index') }}"><span class="icon">🏠</span><span>最初の画面にもどる</span></a>

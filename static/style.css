@@ -50,12 +50,22 @@ a { color: inherit; }
 }
 
 .app-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   min-width: 0;
   font-size: 1.1rem;
   font-weight: 700;
   white-space: nowrap;
   text-decoration: none;
   letter-spacing: 0.05em;
+}
+
+.app-logo {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
 }
 
 .back-link {
@@ -76,8 +86,14 @@ a { color: inherit; }
   }
 
   .app-name {
+    gap: 6px;
     font-size: 0.9rem;
     letter-spacing: 0.02em;
+  }
+
+  .app-logo {
+    width: 36px;
+    height: 36px;
   }
 
   .back-link {
