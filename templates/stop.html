@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 
 {% block back %}
   {% if route %}
@@ -15,7 +16,7 @@
   <p class="notice-text">{{ registration.message }}</p>
   <a class="link-button" href="{{ registration.url }}" target="_blank" rel="noopener">利用者登録のしかたを見る</a>
   <a class="big-button call-button" href="tel:{{ registration.phone }}">
-    <span class="icon">📞</span>
+    <span class="icon">{{ icon("phone") }}</span>
     <span>町に電話して登録する<small>{{ registration.office }} {{ registration.phone }}</small></span>
   </a>
 </section>
@@ -27,7 +28,7 @@
     <input type="hidden" name="route_id" value="{{ route.id }}">
     {% for stop_name in route.district_stops %}
       <button class="big-button" type="submit" name="stop" value="{{ stop_name }}">
-        <span class="icon">🚏</span><span>{{ stop_name }}</span>
+        <span class="icon">{{ icon("stop") }}</span><span>{{ stop_name }}</span>
       </button>
     {% endfor %}
   </form>
@@ -35,7 +36,7 @@
   <div class="button-list">
     {% for r in routes %}
       <a class="big-button" href="{{ url_for('stop', route=r.id) }}">
-        <span class="icon">🚌</span>
+        <span class="icon">{{ icon("bus") }}</span>
         <span>{{ r.name }}<small>{{ r.districts | join('・') }}区</small></span>
       </a>
     {% endfor %}

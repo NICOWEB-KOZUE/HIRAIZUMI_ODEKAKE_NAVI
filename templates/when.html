@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 
 {% block back %}<a class="back-link" href="{{ url_for('index') }}">もどる</a>{% endblock %}
 
@@ -9,14 +10,14 @@
 {% if guide %}
 <section class="notice direct-guide">
   {% if guide.trips %}
-    <p class="direct-title">🚌 バス停「{{ guide.stop }}」で直接降りられる便</p>
+    <p class="direct-title"><span class="inline-icon">{{ icon("bus") }}</span>バス停「{{ guide.stop }}」で直接降りられる便</p>
     <ul class="direct-list">
       {% for t in guide.trips %}<li>{{ t.label }}</li>{% endfor %}
     </ul>
     {% if next_direct_day %}<p class="direct-next">次に直接行ける日: <strong>{{ next_direct_day }}</strong></p>{% endif %}
     <p class="direct-other">ほかの日は平泉駅で降りて歩きます{% if guide.walk %}（ゆっくり歩いて約{{ guide.walk }}分）{% endif %}</p>
   {% else %}
-    <p class="direct-title">🚌 バス停「{{ guide.stop }}」に止まる便はありません</p>
+    <p class="direct-title"><span class="inline-icon">{{ icon("bus") }}</span>バス停「{{ guide.stop }}」に止まる便はありません</p>
     <p class="direct-other">平泉駅で降りて歩きます{% if guide.walk %}（ゆっくり歩いて約{{ guide.walk }}分）{% endif %}</p>
   {% endif %}
 </section>
@@ -26,34 +27,44 @@
   <input type="hidden" name="origin" value="{{ origin }}">
   <input type="hidden" name="place" value="{{ place.id }}">
 
-  <div class="date-list">
-    {% for c in choices %}
-      <label class="date-option {% if not c.runs %}no-bus{% endif %}">
-        <input type="radio" name="date" value="{{ c.value }}" {% if c.value == selected %}checked{% endif %}>
-        <span class="date-main">{{ c.label }}</span>
-        <span class="date-sub">{{ c.sub }}</span>
-        {% if uses_bus and not c.runs %}<span class="date-badge">この日は運行なし</span>{% endif %}
-        {% if c.direct %}<span class="date-badge direct">{{ guide.stop }}まで直接行けます</span>{% endif %}
-      </label>
-    {% endfor %}
-    <label class="date-option">
-      <input type="radio" name="date" value="other" data-other-date>
-      <span class="date-main">それ以外の日</span>
-      <input class="date-input" type="date" name="other_date" min="{{ today }}" hidden>
+  {% macro date_option(c, mark_runs=False) %}
+    <label class="date-option {% if not c.runs %}no-bus{% endif %}">
+      <input type="radio" name="date" value="{{ c.value }}" {% if c.value == selected %}checked{% endif %}>
+      <span class="date-main">{{ c.label }}</span>
+      {% if c.sub %}<span class="date-sub">{{ c.sub }}</span>{% endif %}
+      {% if uses_bus and not c.runs %}<span class="date-badge">この日は運行なし</span>{% endif %}
+      {% if c.next_run %}<span class="date-badge direct">次にバスが走る日</span>{% endif %}
+      {% if c.direct %}<span class="date-badge direct">{{ guide.stop }}まで直接行けます</span>
+      {% elif mark_runs and uses_bus and c.runs %}<span class="date-badge direct">バスが走る日</span>{% endif %}
     </label>
+  {% endmacro %}
+
+  <div class="date-list">
+    {% for c in choices %}{{ date_option(c) }}{% endfor %}
+
+    <details class="later-days">
+      <summary class="later-toggle">それ以外の日</summary>
+      <div class="date-list">
+        {% for c in later[:14] %}{{ date_option(c, true) }}{% endfor %}
+        {% if later | length > 14 %}
+        <details class="later-days">
+          <summary class="later-toggle more">もっと先の日を見る</summary>
+          <div class="date-list">
+            {% for c in later[14:] %}{{ date_option(c, true) }}{% endfor %}
+          </div>
+        </details>
+        {% endif %}
+      </div>
+    </details>
   </div>
 
-  {% if uses_bus and next_bus_day %}
-    <p class="hint">次にコミュニティバスが走る日: {{ next_bus_day }}</p>
-  {% endif %}
-
-  <h2 class="subtitle">時間帯</h2>
+  <h2 class="subtitle"><span class="nowrap">時間帯を選ぶと、</span><span class="nowrap">行き方が出ます</span></h2>
   <div class="button-list">
-    <button class="big-button primary" type="submit" name="period" value="am">
-      <span class="icon">🌅</span><span>午前中</span>
+    <button class="big-button primary go-button" type="submit" name="period" value="am">
+      <span class="icon">{{ icon("morning") }}</span><span class="nowrap">午前中に行く</span>
     </button>
-    <button class="big-button primary" type="submit" name="period" value="pm">
-      <span class="icon">☀️</span><span>午後</span>
+    <button class="big-button primary go-button" type="submit" name="period" value="pm">
+      <span class="icon">{{ icon("afternoon") }}</span><span class="nowrap">午後に行く</span>
     </button>
   </div>
 </form>

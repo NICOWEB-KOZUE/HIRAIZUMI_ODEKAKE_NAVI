@@ -61,6 +61,8 @@ a { color: inherit; }
   letter-spacing: 0.05em;
 }
 
+.app-title { min-width: 0; }
+
 .app-logo {
   flex: none;
   width: 46px;
@@ -89,6 +91,8 @@ a { color: inherit; }
     gap: 6px;
     font-size: 0.9rem;
     letter-spacing: 0.02em;
+    white-space: normal;
+    line-height: 1.3;
   }
 
   .app-logo {
@@ -204,11 +208,15 @@ a { color: inherit; }
   flex: none;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--primary-soft);
-  font-size: 1.6rem;
+  width: 54px;
+  height: 54px;
+}
+
+.hand-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .big-button small {
@@ -224,9 +232,31 @@ a { color: inherit; }
   color: #fff;
 }
 
-.big-button.primary .icon { background: rgba(255, 255, 255, 0.9); }
+.big-button.primary .icon {
+  padding: 5px;
+  border-radius: 50%;
+  background: #fff;
+}
 
 .big-button.primary:hover { background: var(--primary-dark); }
+
+.nowrap {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.go-button { gap: 12px; }
+
+.go-button::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 0 8px 0 auto;
+  border-top: 5px solid currentColor;
+  border-right: 5px solid currentColor;
+  transform: rotate(45deg);
+}
 
 .category-button:hover .icon { animation: wiggle 0.5s ease; }
 
@@ -236,8 +266,6 @@ a { color: inherit; }
 }
 
 .call-button { margin-top: 12px; border-color: var(--green); }
-.call-button .icon { background: var(--green-soft); }
-
 .quiet-area {
   margin-top: 36px;
   text-align: center;
@@ -419,16 +447,46 @@ a { color: inherit; }
 .direct-next { margin: 4px 0; }
 .direct-other { margin: 4px 0 0; font-size: 0.95rem; color: var(--sub); }
 
-.date-input {
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px;
-  border: 3px solid var(--primary);
-  border-radius: 12px;
-  font: inherit;
-  font-size: 1.15rem;
-  animation: pop-in 0.3s ease-out both;
+.later-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border: 3px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
 }
+
+.later-toggle::-webkit-details-marker { display: none; }
+
+.later-toggle::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-right: 4px solid var(--sub);
+  border-bottom: 4px solid var(--sub);
+  transform: rotate(45deg) translateY(-3px);
+  transition: transform 0.2s ease;
+}
+
+.later-days[open] > .later-toggle::after { transform: rotate(-135deg) translateY(-3px); }
+
+.later-days[open] > .later-toggle { margin-bottom: 12px; border-color: var(--primary-dark); }
+
+.later-toggle.more {
+  justify-content: center;
+  gap: 14px;
+  border-style: dashed;
+  font-size: 1.1rem;
+}
+
+.later-days .date-list { animation: pop-in 0.3s ease-out both; }
 
 /* ---------- お知らせ ---------- */
 
@@ -445,7 +503,7 @@ a { color: inherit; }
 .notice-warn { background: var(--warn-soft); border-left: 8px solid var(--warn); color: var(--warn); }
 .notice-ok { background: var(--green-soft); border-left: 8px solid var(--green); color: var(--green); }
 
-/* ---------- おでかけの道のり（犬が歩く） ---------- */
+/* ---------- おでかけの道のり（おじいちゃんとおばあちゃんが歩く） ---------- */
 
 .journey-card {
   margin-top: 8px;
@@ -491,6 +549,8 @@ a { color: inherit; }
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
+.journey-icon .hand-icon { width: 34px; height: 34px; }
+
 .journey-step.reached .journey-icon {
   border-color: var(--primary);
   transform: scale(1.12);
@@ -517,27 +577,147 @@ a { color: inherit; }
 }
 
 .walker-dog {
-  display: inline-block;
-  font-size: 2.4rem;
-  line-height: 1;
-  transform: scaleX(-1);
+  display: block;
+  width: 86px;
+  height: 51px;
 }
 
-.walker.walking .walker-dog { animation: trot 0.4s ease-in-out infinite; }
+.couple {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
 
-@keyframes trot {
-  50% { transform: scaleX(-1) translateY(-6px) rotate(-6deg); }
+.couple {
+  --gait: 1.1s;
+}
+
+.couple .limb,
+.couple .shin {
+  transform-box: view-box;
+}
+
+.couple .leg path,
+.couple .arm path,
+.couple .front-leg,
+.couple .front-arm {
+  fill: none;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+}
+
+/* 着いたら正面を向く */
+.couple .front { display: none; }
+.walker.arrived .couple .side,
+.footer-dog.arrived .couple .side { display: none; }
+.walker.arrived .couple .front,
+.footer-dog.arrived .couple .front { display: inline; }
+
+.couple .head,
+.couple .hand { fill: #f6d0b0; }
+.couple .arm-back .hand { fill: #e2b896; }
+.couple .eye { fill: #5a4636; }
+.couple .smile {
+  fill: none;
+  stroke: #8a624c;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+.couple .shoe { fill: #3a2c24; }
+.couple .hair,
+.couple .bun { fill: #d5d5dc; }
+
+.grandma .body { fill: #e48aa0; }
+.grandma .arm-front path { stroke: #d2718b; }
+.grandma .arm-back path { stroke: #b65d75; }
+.grandma .leg-front path { stroke: #7d624c; }
+.grandma .leg-back path { stroke: #5c4838; }
+.grandma .front-arm { stroke: #d2718b; }
+.grandma .front-leg { stroke: #7d624c; }
+.grandma .bun { fill: #c4c4ce; }
+
+.grandpa .body { fill: #3d7eab; }
+.grandpa .arm-front path { stroke: #2f6a94; }
+.grandpa .arm-back path { stroke: #245475; }
+.grandpa .leg-front path { stroke: #3a4658; }
+.grandpa .leg-back path { stroke: #262f3d; }
+.grandpa .front-arm { stroke: #2f6a94; }
+.grandpa .front-leg { stroke: #3a4658; }
+.grandpa .cap { fill: #8b5a32; }
+.grandpa .brim { fill: #6e4424; }
+
+/* 立っているときの足と手 */
+.couple .leg-front { transform: rotate(-7deg); }
+.couple .leg-back { transform: rotate(7deg); }
+.couple .arm-front { transform: rotate(5deg); }
+.couple .arm-back { transform: rotate(-5deg); }
+
+/* 歩くとき: 2人の足並みを少しずらし、左右の足は半周期ずらす */
+.couple .grandpa { --offset: 0s; }
+.couple .grandma { --offset: -0.35s; }
+.couple .leg-front,
+.couple .arm-front { --phase: 0s; }
+.couple .leg-back,
+.couple .arm-back { --phase: calc(var(--gait) / -2); }
+
+.walker.walking .couple .leg,
+.footer-dog.walking .couple .leg {
+  animation: stride var(--gait) infinite;
+  animation-delay: calc(var(--phase) + var(--offset));
+}
+
+.walker.walking .couple .shin,
+.footer-dog.walking .couple .shin {
+  animation: knee var(--gait) infinite;
+  animation-delay: calc(var(--phase) + var(--offset));
+}
+
+.walker.walking .couple .arm,
+.footer-dog.walking .couple .arm {
+  animation: arm-swing var(--gait) ease-in-out infinite;
+  animation-delay: calc(var(--phase) + var(--offset));
+}
+
+.walker.walking .couple .person,
+.footer-dog.walking .couple .person {
+  animation: step-bob calc(var(--gait) / 2) ease-in-out infinite;
+  animation-delay: var(--offset);
+}
+
+/* かかとから着いて、足を後ろへ送り、ひざを曲げて前へ出す */
+@keyframes stride {
+  0% { transform: rotate(-20deg); animation-timing-function: linear; }
+  55% { transform: rotate(17deg); animation-timing-function: ease-in-out; }
+  100% { transform: rotate(-20deg); }
+}
+
+@keyframes knee {
+  0%, 52% { transform: rotate(0deg); animation-timing-function: ease-out; }
+  70% { transform: rotate(42deg); animation-timing-function: ease-in-out; }
+  92% { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes arm-swing {
+  0%, 100% { transform: rotate(13deg); }
+  50% { transform: rotate(-13deg); }
+}
+
+@keyframes step-bob {
+  0%, 100% { transform: translateY(0.9px); }
+  50% { transform: translateY(-0.9px); }
 }
 
 .walker.arrived .walker-dog { animation: happy 0.5s ease 2; }
 
 @keyframes happy {
-  50% { transform: scaleX(-1) translateY(-14px); }
+  50% { transform: translateY(-14px); }
 }
 
 .bubble {
   position: absolute;
-  bottom: calc(100% - 4px);
+  bottom: calc(100% + 8px);
   padding: 6px 14px;
   border: 3px solid var(--primary);
   border-radius: 14px;
@@ -563,6 +743,8 @@ a { color: inherit; }
   to { opacity: 1; transform: none; }
 }
 
+.walker.edge-left { align-items: flex-start; }
+.walker.edge-right { align-items: flex-end; }
 .walker.edge-left .bubble { left: 0; }
 .walker.edge-left .bubble::after { left: 26px; }
 .walker.edge-right .bubble { right: 0; }
@@ -635,6 +817,7 @@ a { color: inherit; }
 .leg-icon {
   flex: none;
   width: 40px;
+  height: 40px;
   font-size: 1.6rem;
   text-align: center;
 }
@@ -676,6 +859,14 @@ a { color: inherit; }
 }
 
 .transport-name { margin: 0; font-size: 1.1rem; }
+
+.inline-icon {
+  display: inline-block;
+  width: 1.8em;
+  height: 1.8em;
+  margin-right: 6px;
+  vertical-align: middle;
+}
 .transport-fare { margin: 6px 0 0; font-size: 1rem; }
 .transport-note { margin: 6px 0 0; font-size: 0.95rem; color: var(--sub); }
 
@@ -700,6 +891,8 @@ a { color: inherit; }
   transition: transform 0.12s ease;
 }
 
+.action-label { display: inline-flex; align-items: center; }
+.action-button .inline-icon { width: 1.5em; height: 1.5em; }
 .action-button small { font-size: 0.8rem; font-weight: 400; }
 .action-button.call { background: var(--green); color: #fff; }
 .action-button.times { background: var(--info-soft); border: 2px solid #1a4f8f; color: #1a4f8f; }
@@ -722,12 +915,12 @@ a { color: inherit; }
 
 .time-table th { background: var(--primary-soft); }
 
-/* ---------- 画面の下の犬 ---------- */
+/* ---------- 画面の下のおじいちゃんとおばあちゃん ---------- */
 
 .dog-footer {
   position: relative;
   flex: none;
-  height: 110px;
+  height: 122px;
   margin-top: 24px;
   pointer-events: none;
 }
@@ -752,19 +945,47 @@ a { color: inherit; }
   fill: #5b4a3a;
 }
 
+/* 舞い落ちる花びら・葉・雪 */
+.scenery .fall {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fall linear infinite;
+}
+
+.scenery .snow { animation-name: snowfall; }
+
+@keyframes fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translate(-36px, 112px) rotate(320deg); opacity: 0; }
+}
+
+@keyframes snowfall {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translate(-8px, 56px); }
+  90% { opacity: 1; }
+  100% { transform: translate(4px, 112px); opacity: 0; }
+}
+
 .footer-dog {
   position: absolute;
-  right: 22px;
-  bottom: 4px;
+  left: calc(100% - 84px);
+  bottom: 1px;
+  width: 78px;
+  height: 46px;
   padding: 0;
   border: none;
   background: none;
-  font-size: 2.6rem;
-  line-height: 1;
   cursor: pointer;
   pointer-events: auto;
-  animation: hop 0.6s ease 0.4s 1;
+  transition-property: left;
+  transition-timing-function: linear;
 }
+
+/* 中尊寺のある左へ向かって歩く */
+.footer-dog .couple { transform: scaleX(-1); }
 
 .footer-dog.hop { animation: hop 0.6s ease 1; }
 
@@ -772,6 +993,52 @@ a { color: inherit; }
   30% { transform: translateY(-16px) rotate(-8deg); }
   60% { transform: translateY(0); }
   80% { transform: translateY(-5px); }
+}
+
+/* ---------- 左右の余白の季節の飾り（動かない） ---------- */
+
+.side-deco { display: none; }
+
+@media (min-width: 800px) {
+  .side-deco {
+    display: block;
+    position: fixed;
+    inset: 70px 0 140px;
+    pointer-events: none;
+  }
+
+  .side-deco-strip {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: calc((100% - 640px) / 2);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .side-deco-strip.left { left: 0; }
+  .side-deco-strip.right { right: 0; }
+
+  .side-deco-branch {
+    display: block;
+    width: min(100%, 190px);
+    height: auto;
+    max-height: 100%;
+    opacity: 0.8;
+  }
+
+  .side-deco-strip.right .side-deco-branch {
+    align-self: flex-end;
+    width: min(85%, 160px);
+    transform: scaleX(-1);
+  }
+
+  .app-header,
+  .page,
+  .dog-footer { position: relative; z-index: 1; }
+
+  .app-header { position: sticky; z-index: 10; }
 }
 
 /* ---------- 動きを減らす設定の人 ---------- */

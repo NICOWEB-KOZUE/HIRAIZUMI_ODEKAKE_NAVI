@@ -1,0 +1,182 @@
+{% set pal = {
+  "spring": {"sky": "#fde3ec", "far": "#d9ecd3", "kinkei": "#c3dfc0", "hill": "#b3d99f", "ground": "#bfe0a2",
+             "pond": "#9fd3ec", "cloud": "#ffffff", "tree": ["#f6b6cb", "#fbd3e0"], "sun": "#ffe08a"},
+  "summer": {"sky": "#d4ecfb", "far": "#c4e3c4", "kinkei": "#a9d3ad", "hill": "#8cc77e", "ground": "#a6d68a",
+             "pond": "#7fc3e8", "cloud": "#ffffff", "tree": ["#5fa653", "#7cc06a"], "sun": "#ffd447"},
+  "autumn": {"sky": "#fde6cf", "far": "#efdcbc", "kinkei": "#e3c48f", "hill": "#dcc47e", "ground": "#cdd58e",
+             "pond": "#9cc9e0", "cloud": "#ffffff", "tree": ["#e0573a", "#f2a03d"], "sun": "#ffc36b"},
+  "winter": {"sky": "#d9e7f5", "far": "#e9f0f7", "kinkei": "#dfe8f2", "hill": "#f3f7fb", "ground": "#eef3f8",
+             "pond": "#c9e3f0", "cloud": "#f4f7fb", "tree": ["#e2eaf3", "#ffffff"], "sun": none},
+}[season] %}
+
+{% macro tree(x, y, s=1) %}
+  <g transform="translate({{ x }} {{ y }}) scale({{ s }})">
+    <rect x="-1" y="-7" width="2" height="7" fill="#8a5a3c"/>
+    <circle cx="-3.2" cy="-9" r="4.2" fill="{{ pal.tree[0] }}"/>
+    <circle cx="3.2" cy="-9.5" r="4.4" fill="{{ pal.tree[0] }}"/>
+    <circle cx="0" cy="-13" r="4.8" fill="{{ pal.tree[1] }}"/>
+  </g>
+{% endmacro %}
+
+<svg class="scenery season-{{ season }}" viewBox="0 0 1200 112" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="{{ pal.sky }}" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="{{ pal.sky }}" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="{{ pal.sky }}"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="112" fill="url(#sky)"/>
+
+  {% if pal.sun %}
+  <!-- にっこり太陽 -->
+  <g class="sun" transform="translate(708 24)">
+    <g stroke="{{ pal.sun }}" stroke-width="1.6" stroke-linecap="round">
+      <path d="M0 -14 V-11.5 M0 14 V11.5 M-14 0 H-11.5 M14 0 H11.5 M-10 -10 L-8.2 -8.2 M10 10 L8.2 8.2 M10 -10 L8.2 -8.2 M-10 10 L-8.2 8.2"/>
+    </g>
+    <circle r="8.5" fill="{{ pal.sun }}"/>
+    <circle cx="-2.8" cy="-1" r="0.9" fill="#7a5a3a"/>
+    <circle cx="2.8" cy="-1" r="0.9" fill="#7a5a3a"/>
+    <path d="M-2.6 2.2 Q0 4.4 2.6 2.2" fill="none" stroke="#7a5a3a" stroke-width="0.8" stroke-linecap="round"/>
+    <circle cx="-5" cy="2" r="1.3" fill="#f59a8a" opacity="0.6"/>
+    <circle cx="5" cy="2" r="1.3" fill="#f59a8a" opacity="0.6"/>
+  </g>
+  {% endif %}
+
+  <!-- 雲 -->
+  <g fill="{{ pal.cloud }}" opacity="0.95">
+    <ellipse cx="300" cy="22" rx="34" ry="8"/>
+    <ellipse cx="322" cy="16" rx="20" ry="8"/>
+    <ellipse cx="540" cy="18" rx="22" ry="6"/>
+    <ellipse cx="554" cy="13" rx="13" ry="6"/>
+    <ellipse cx="860" cy="26" rx="40" ry="8"/>
+    <ellipse cx="884" cy="19" rx="22" ry="8"/>
+  </g>
+
+  <!-- 遠くの山なみ -->
+  <path d="M0 70 C120 48 240 46 360 60 C450 70 520 50 600 46 C700 42 800 58 880 56 C980 52 1100 64 1200 58 L1200 100 L0 100Z" fill="{{ pal.far }}"/>
+  <!-- 金鶏山 -->
+  <path d="M585 88 Q615 38 645 88Z" fill="{{ pal.kinkei }}"/>
+  {% if season == "winter" %}
+  <path d="M603 70 Q615 56 627 70 Q615 66 603 70Z" fill="#ffffff"/>
+  {% endif %}
+
+  <!-- 東北本線: 中尊寺の丘と毛越寺の向こうを走る -->
+  <path d="M0 80.4 H1200" stroke="#b9a78f" stroke-width="1.8" stroke-dasharray="1 3"/>
+  <path d="M0 79.6 H1200" stroke="#8f8170" stroke-width="0.8"/>
+  <g id="train" style="transform: translateX(-300px)">
+    <g transform="translate(0 66)">
+      <path d="M3 0 H36 V12 H0 V5 Q0 0 3 0Z" fill="#eef1f5" stroke="#9aa5b1" stroke-width="0.5"/>
+      <path d="M1 5 Q1.2 1.6 3.6 1.4 H6.5 V5Z" fill="#4d6070"/>
+      <g fill="#5c7286">
+        <rect x="9" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="15.5" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="22" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="28.5" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+      </g>
+      <rect x="0" y="7.4" width="36" height="1.4" fill="#7b4fa0"/>
+      <rect x="0" y="8.8" width="36" height="1.2" fill="#e0569a"/>
+      <circle cx="1.7" cy="10.4" r="0.8" fill="#ffe27a"/>
+
+      <rect x="38" y="0" width="36" height="12" rx="1.5" fill="#eef1f5" stroke="#9aa5b1" stroke-width="0.5"/>
+      <g fill="#5c7286">
+        <rect x="41" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="47.5" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="54" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="60.5" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+        <rect x="67" y="2.2" width="4.5" height="3.6" rx="0.6"/>
+      </g>
+      <rect x="38" y="7.4" width="36" height="1.4" fill="#7b4fa0"/>
+      <rect x="38" y="8.8" width="36" height="1.2" fill="#e0569a"/>
+      <path d="M52 0 L56 -4 L60 0 M53 -4 H59" fill="none" stroke="#5a5a5a" stroke-width="0.6"/>
+
+      <g fill="#3b3b3b">
+        <circle cx="6" cy="12.6" r="1.6"/>
+        <circle cx="30" cy="12.6" r="1.6"/>
+        <circle cx="44" cy="12.6" r="1.6"/>
+        <circle cx="68" cy="12.6" r="1.6"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- 中尊寺: 杉の丘と本堂、金色堂 -->
+  <path d="M396 92 C414 72 436 54 462 51.5 L556 51.5 C578 54 594 72 604 92Z" fill="{{ pal.hill }}"/>
+  <path d="M414 80 L421 54 L428 80Z M426 80 L433 50 L440 80Z M438 80 L445 56 L452 80Z" fill="#4f7f4a"/>
+  <rect x="470" y="40" width="30" height="12" fill="#7a4a2c"/>
+  <path d="M460 42 Q472 40 478 30 L492 30 Q498 40 510 42Z" fill="#3f3f46"/>
+  <rect x="476" y="27" width="18" height="3" rx="1" fill="#3f3f46"/>
+  <rect x="524" y="44" width="18" height="8" fill="#e0b23a"/>
+  <path d="M519 45 Q527 42 533 35 Q539 42 547 45Z" fill="#c9951c"/>
+  {% if season == "winter" %}
+  <path d="M476 26.6 L494 26.6 Q495 31 498 34 Q485 31.5 472 34 Q475 31 476 26.6Z" fill="#ffffff"/>
+  <path d="M528.5 38.8 Q533 33.6 537.5 38.8 Q533 37.6 528.5 38.8Z" fill="#ffffff"/>
+  <path d="M414 64 L421 54 L428 64 Q421 61 414 64Z M426 61 L433 50 L440 61 Q433 58 426 61Z M438 66 L445 56 L452 66 Q445 63 438 66Z" fill="#ffffff"/>
+  {% endif %}
+  <text x="486" y="20" text-anchor="middle" class="scenery-label" data-chusonji>中尊寺</text>
+  {{ tree(582, 62) }}
+
+  <!-- 毛越寺: 本堂と大泉が池 -->
+  <rect x="642" y="72" width="36" height="13" fill="#7a4a2c"/>
+  <path d="M632 74 Q646 72 652 62 L668 62 Q674 72 688 74Z" fill="#3f3f46"/>
+  <rect x="650" y="59" width="20" height="3" rx="1" fill="#3f3f46"/>
+  {% if season == "winter" %}
+  <path d="M650 58.6 L670 58.6 Q671 63 674 66.5 Q660 64 646 66.5 Q649 63 650 58.6Z" fill="#ffffff"/>
+  {% endif %}
+  <text x="660" y="52" text-anchor="middle" class="scenery-label">毛越寺</text>
+
+  <path d="M0 88 C200 84 400 90 600 87 C800 84 1000 90 1200 86 L1200 100 L0 100Z" fill="{{ pal.ground }}"/>
+  <ellipse cx="660" cy="93" rx="56" ry="5" fill="{{ pal.pond }}"/>
+  <ellipse cx="612" cy="92" rx="6" ry="3" fill="#9a9a8f"/>
+
+  {{ tree(728, 89, 1.1) }}
+  {{ tree(746, 90, 0.85) }}
+  {{ tree(120, 88, 1.1) }}
+  {{ tree(250, 86) }}
+  {{ tree(345, 89, 0.9) }}
+  {{ tree(880, 86, 1.1) }}
+  {{ tree(1000, 88) }}
+  {{ tree(1120, 87, 1.1) }}
+
+  <!-- 道とコミュニティバス -->
+  <rect x="0" y="100" width="1200" height="12" fill="{{ '#e4e9ee' if season == 'winter' else '#e6d8bd' }}"/>
+  <path d="M0 106.5 H1200" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="6 5"/>
+  <g id="bus" style="transform: translateX(-300px)">
+    <g transform="translate(0 89)">
+      <rect x="0" y="0" width="34" height="15" rx="4" fill="#fff6dc" stroke="#d7a34b" stroke-width="0.6"/>
+      <rect x="0.3" y="9" width="33.4" height="2.6" fill="#f28c38"/>
+      <g fill="#6d8ea8">
+        <rect x="3" y="2.5" width="5.5" height="5" rx="1"/>
+        <rect x="10" y="2.5" width="5.5" height="5" rx="1"/>
+        <rect x="17" y="2.5" width="5.5" height="5" rx="1"/>
+        <rect x="24" y="2.5" width="4" height="5" rx="1"/>
+      </g>
+      <path d="M29.5 2.5 H31.5 Q33.2 2.8 33.4 5 V7.5 H29.5Z" fill="#6d8ea8"/>
+      <circle cx="32.6" cy="12.6" r="0.9" fill="#ffe27a"/>
+      <g fill="#3b3b3b">
+        <circle cx="8" cy="15.4" r="2.6"/>
+        <circle cx="26" cy="15.4" r="2.6"/>
+      </g>
+      <g fill="#d9d9d9">
+        <circle cx="8" cy="15.4" r="1"/>
+        <circle cx="26" cy="15.4" r="1"/>
+      </g>
+    </g>
+  </g>
+
+  {% if season != "summer" %}
+  <!-- 舞い落ちる花びら・葉・雪 -->
+  {% set fall_x = [470, 505, 540, 575, 610, 645, 680, 715, 740, 488, 598, 662, 30, 140, 250, 360, 800, 910, 1020, 1130] %}
+  {% for x in fall_x %}
+    {% set i = loop.index0 %}
+    {% set timing = "animation-duration: %ds; animation-delay: -%.1fs" | format(7 + (i * 3) % 5, (i * 1.3) % 8) %}
+    {% set y = (i * 17) % 24 - 10 %}
+    {% if season == "spring" %}
+      <ellipse class="fall" cx="{{ x }}" cy="{{ y }}" rx="2" ry="1.2" fill="#f5a9c2" style="{{ timing }}"/>
+    {% elif season == "autumn" %}
+      <ellipse class="fall" cx="{{ x }}" cy="{{ y }}" rx="2.3" ry="1.4" fill="{{ '#e0573a' if i % 2 else '#f2a03d' }}" style="{{ timing }}"/>
+    {% else %}
+      <circle class="fall snow" cx="{{ x }}" cy="{{ y }}" r="1.4" fill="#ffffff" style="{{ timing }}"/>
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+</svg>

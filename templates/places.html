@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 
 {% block back %}<a class="back-link" href="{{ url_for('index') }}">もどる</a>{% endblock %}
 
 {% block content %}
 <h1 class="title">行き先を選んでください</h1>
-<p class="lead">{{ category.icon }} {{ category.label }}</p>
+<p class="lead">{{ category.label }}</p>
 
 {% for section in sections %}
   {% if section.title %}<h2 class="subtitle">{{ section.title }}</h2>{% endif %}
   <div class="button-list">
     {% for p in section.places %}
       <a class="big-button" href="{{ url_for('when', origin=origin, place=p.id) }}">
-        <span class="icon">{{ category.icon }}</span><span>{{ p.name }}</span>
+        <span class="icon">{{ icon(category.id) }}</span><span>{{ p.name }}</span>
       </a>
     {% endfor %}
   </div>

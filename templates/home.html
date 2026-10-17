@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 
 {% block content %}
 <form action="{{ url_for('places') }}" method="get">
@@ -13,7 +14,7 @@
   <div class="button-list">
     {% for c in categories %}
       <button class="big-button category-button" type="submit" name="category" value="{{ c.id }}">
-        <span class="icon">{{ c.icon }}</span><span>{{ c.label }}</span>
+        <span class="icon">{{ icon(c.id) }}</span><span>{{ c.label }}</span>
       </button>
     {% endfor %}
   </div>

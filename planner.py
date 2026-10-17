@@ -18,6 +18,10 @@ LONG_WALK_MINUTES = 20
 MIN_STAY_TOWN = 30
 MIN_STAY_OUT = 60
 DEFAULT_STAY_OUT = 120
+NEAR_STOP_MINUTES = 3
+NEARBY_LABEL = "帰りは別のルートのバスで帰る"
+TOBAN_LABEL = "帰りは一関駅をまわって、路線バスで帰る"
+OTHER_BACK_HINT = "タクシーのほかに、バスで帰る方法もあります（下の候補）"
 PERIOD_START = {"am": "9:00", "pm": "13:00"}
 PERIOD_LABEL = {"am": "午前中", "pm": "午後"}
 TRIP_LABEL = {"am": "午前", "pm": "午後"}
@@ -464,6 +468,59 @@ def taxi_home_leg(from_stop):
     return text_leg("🚕", f"{from_stop}から家まではタクシーをおすすめします")
 
 
+def nearby_stops(settings):
+    """家のバス停の近くに止まる、ほかのルートのバス停。[(route_id, バス停, 家のバス停からバスで何分)]
+    位置のデータがないので、家のルートでバスで NEAR_STOP_MINUTES 分以内に通るバス停を近いとみる"""
+    if settings.get("mode") != "bus":
+        return []
+    route = find_route(settings["route_id"])
+    times = dict(zip(route["district_stops"], route["trips"][0]["district_times"]))
+    home = settings.get("stop")
+    if home not in times:
+        return []
+    near = []
+    for other in COMMUNITY["routes"]:
+        if other["id"] == route["id"]:
+            continue
+        for stop in other["district_stops"]:
+            if stop in times:
+                minutes = abs(to_min(times[stop]) - to_min(times[home]))
+                if minutes <= NEAR_STOP_MINUTES:
+                    near.append((other["id"], stop, minutes))
+    return near
+
+
+def nearby_home_rides(settings, d, from_stop, after):
+    """家に帰るバスがないときに使える、家の近くのバス停まで行くほかのルートの便"""
+    rides = []
+    for route_id, stop, minutes in nearby_stops(settings):
+        for ride in community_rides(d, from_stop, stop, [route_id]):
+            if ride["dep"] >= after:
+                ride["near_minutes"] = minutes
+                rides.append(ride)
+    rides.sort(key=lambda r: r["dep"])
+    return rides
+
+
+def from_nearby_stop_leg(settings, ride):
+    if ride["near_minutes"] == 0:
+        return None
+    return text_leg("🚕", f"{ride['to']}から家までは、歩くかタクシー"
+                          f"（「{ride['to']}」は、家のバス停「{settings['stop']}」からバスで約{ride['near_minutes']}分のところです）")
+
+
+def back_candidate(base, back, ready_at, label):
+    """候補 base の帰りを、家のバス停か家の近くのバス停まで帰る back に入れかえた候補"""
+    ride = next(leg for leg in back if leg.get("near_minutes") is not None)
+    first = next(i for i, leg in enumerate(back) if leg["kind"] == "ride")
+    stay = back[first]["dep"] - sum(leg.get("minutes") or 0 for leg in back[:first]) - ready_at
+    where = "家のバス停" if ride["near_minutes"] == 0 else f"家の近くのバス停「{ride['to']}」"
+    return dict(base, label=label, back=back, back_warnings=[],
+                back_note=f"いつものバスでは帰れませんが、{ride['line']}で{where}まで帰れます",
+                stay=duration_text(stay) if stay > 0 else None, fare_back=fare_summary(back),
+                recommended=False)
+
+
 # ---------- 町の中の行き先 ----------
 
 def plan_town(settings, origin, place, d, period):
@@ -509,7 +566,36 @@ def plan_town(settings, origin, place, d, period):
         "stay": duration_text(stay) if stay else None,
         "fare_go": fare_summary(go), "fare_back": fare_summary(back),
     }
-    return [candidate], notices
+    candidates = [candidate]
+    if not rides:
+        near_back = nearby_town_back(settings, d, stop, ready)
+        if near_back:
+            candidates.append(back_candidate(candidate, near_back, arrive + walk, NEARBY_LABEL))
+        toban_back = toban_town_back(settings, d, stop, ready)
+        if toban_back:
+            candidates.append(back_candidate(candidate, toban_back, arrive + walk, TOBAN_LABEL))
+        if len(candidates) > 1:
+            candidate["back_warnings"] = ["家のバス停まで帰るコミュニティバスはありません"]
+            candidate["back_note"] = OTHER_BACK_HINT
+    return candidates, notices
+
+
+def nearby_town_back(settings, d, stop, ready):
+    """町の中の行き先から、ほかのルートのバスで家の近くのバス停まで帰る。乗るバス停でも平泉駅からでもよい"""
+    back = []
+    rides = nearby_home_rides(settings, d, stop, ready)
+    if not rides and stop != "平泉駅":
+        to_station = walk_or_taxi_leg(stop, "平泉駅")
+        rides = nearby_home_rides(settings, d, "平泉駅", ready + (to_station.get("minutes") or 10))
+        if rides:
+            back.append(to_station)
+    if not rides:
+        return None
+    back.append(rides[0])
+    home_leg = from_nearby_stop_leg(settings, rides[0])
+    if home_leg:
+        back.append(home_leg)
+    return back
 
 
 # ---------- 一関・水沢の行き先 ----------
@@ -531,11 +617,63 @@ def ichinoseki_back_parts(option):
     return parts
 
 
+def toban_home(settings):
+    """家に帰るのに使える東磐交通一関線の区間。(区間, 一関線が止まるバス停, 家のバス停からバスで何分)
+    家のバス停に止まらなければ、家のルートでバスで NEAR_STOP_MINUTES 分以内のバス停を探す"""
+    home = settings.get("stop")
+    if home in TOBAN_HOME_STOPS:
+        return TOBAN_HOME_STOPS[home], home, 0
+    if settings.get("mode") != "bus":
+        return None
+    route = find_route(settings["route_id"])
+    times = dict(zip(route["district_stops"], route["trips"][0]["district_times"]))
+    if home not in times:
+        return None
+    near = [(abs(to_min(times[s]) - to_min(times[home])), s) for s in TOBAN_HOME_STOPS if s in times]
+    near = [(minutes, s) for minutes, s in near if minutes <= NEAR_STOP_MINUTES]
+    if not near:
+        return None
+    minutes, stop = min(near)
+    return TOBAN_HOME_STOPS[stop], stop, minutes
+
+
+def finish_toban_back(settings, back, minutes):
+    """一関線に乗る帰りに、乗り場と停留所のお知らせ、近くの停留所から家までをつける"""
+    ride = back[-1]
+    ride["near_minutes"] = minutes
+    notes = ["一関駅前から乗ります"]
+    if minutes == 0 and settings.get("stop") != ride["to"]:
+        notes.append(f"停留所の名前は「{ride['to']}」です")
+    ride["note"] = "。".join(notes)
+    home_leg = from_nearby_stop_leg(settings, ride)
+    return back + [home_leg] if home_leg else back
+
+
+def toban_town_back(settings, d, stop, ready):
+    """町の中の行き先から、平泉駅→一関駅とまわって、東磐交通一関線で家の近くまで帰る"""
+    home = toban_home(settings)
+    if home is None:
+        return None
+    seg_id, _, minutes = home
+    back = []
+    if stop != "平泉駅":
+        to_station = walk_or_taxi_leg(stop, "平泉駅")
+        back.append(to_station)
+        ready += to_station.get("minutes") or 10
+    chains = [c for c in all_chains([JR_TO_ICHI + BUS_TO_ICHI, [seg_id]], d) if c[0]["dep"] >= ready]
+    if not chains:
+        return None
+    soonest = min(c[-1]["arr"] for c in chains)
+    chain = max((c for c in chains if c[-1]["arr"] == soonest), key=lambda c: (c[0]["dep"], -c[0]["fare"]))
+    return finish_toban_back(settings, back + chain, minutes)
+
+
 def toban_return(settings, d, option, ready):
     """一関駅から東磐交通で、自宅付近の停留所まで帰る便。乗れる中でいちばん遅く帰れる組み合わせ"""
-    seg_id = TOBAN_HOME_STOPS.get(settings.get("stop"))
-    if seg_id is None or option.get("yamanome"):
+    home = toban_home(settings)
+    if home is None or option.get("yamanome"):
         return None
+    seg_id, _, minutes = home
     buses = segment_rides(seg_id, d)
     if not buses:
         return None
@@ -556,12 +694,7 @@ def toban_return(settings, d, option, ready):
         if not usable:
             return None
         back = [dict(usable[-1])]
-    notes = ["一関駅前から乗ります"]
-    home = settings.get("stop")
-    if home and home != back[-1]["to"]:
-        notes.append(f"停留所の名前は「{back[-1]['to']}」です")
-    back[-1]["note"] = "。".join(notes)
-    return back
+    return finish_toban_back(settings, back, minutes)
 
 
 def hiraizumi_bus_return(d, option, ready):
@@ -602,6 +735,25 @@ def choose_back(settings, d, option, ready, place):
     if settings.get("mode") == "bus":
         warnings.append("帰りのコミュニティバスに間に合いません。平泉駅から家まではタクシーをおすすめします")
     return chain + [taxi_home_leg("平泉駅")], warnings
+
+
+def community_legs_home(settings, back):
+    return [leg for leg in back if leg.get("kind") == "ride" and leg["line"].startswith("コミュニティバス")
+            and leg["to"] == settings.get("stop")]
+
+
+def nearby_out_back(settings, d, option, ready):
+    """平泉駅まで電車やバスで戻って、ほかのルートのコミュニティバスで家の近くのバス停まで帰る"""
+    chains = [c for c in all_chains(option["back"], d) if c[0]["dep"] >= ready]
+    for ride in nearby_home_rides(settings, d, "平泉駅", 0):
+        ok = [c for c in chains if c[-1]["arr"] <= ride["dep"] - TRANSFER_MINUTES]
+        if ok:
+            back = max(ok, key=lambda c: c[0]["dep"]) + [ride]
+            if option.get("yamanome"):
+                apply_yamanome(back)
+            home_leg = from_nearby_stop_leg(settings, ride)
+            return back + [home_leg] if home_leg else back
+    return None
 
 
 def apply_yamanome(legs):
@@ -685,6 +837,7 @@ def plan_out(settings, origin, place, d, period):
             "stay": duration_text(stay) if stay else None, "late": late,
             "fare_go": fare_summary(go), "fare_back": fare_summary(back),
         })
+        main = candidates[-1]
         if bus_back and not taxi_home:
             bus_stay = bus_back[0]["dep"] - arrive_stop if bus_back[0]["kind"] == "ride" else None
             by = option["label"].removesuffix("で行く")
@@ -704,6 +857,12 @@ def plan_out(settings, origin, place, d, period):
                 "back": back, "back_warnings": back_warnings, "back_note": back_note,
                 "stay": duration_text(stay) if stay else None, "fare_back": fare_summary(back),
             })
+        if not community_legs_home(settings, main["back"]):
+            near_back = nearby_out_back(settings, d, option, arrive_stop + MIN_STAY_OUT)
+            if near_back:
+                candidates.append(back_candidate(main, near_back, arrive_stop, NEARBY_LABEL))
+                if not used_toban:
+                    main["back_note"] = OTHER_BACK_HINT
         if toban_back and not used_toban:
             toban_stay = toban_back[0]["dep"] - arrive_stop if toban_back[0]["kind"] == "ride" else None
             by = option["label"].removesuffix("で行く")
@@ -819,7 +978,7 @@ def transports_for(place, d, settings, candidates):
         "phones": [{"label": "東磐交通", "number": "0191-47-3434"}], "times": "geibikei",
     })
     items.append({
-        "icon": "🚕", "name": "タクシー", "fare": "運賃は会社に電話で確認", "note": None,
+        "icon": "🚕", "name": "タクシー", "fare": None, "note": None,
         "phones": [{"label": t["name"], "number": t["phone"]} for t in TAXIS], "times": None,
     })
     def used(item):
@@ -876,19 +1035,35 @@ def plan(settings, origin, place_id, d, period):
 
 # ---------- 画面3の日にちボタン ----------
 
+def day_choice(route, guide, d, label=None, next_run=False):
+    runs = community_runs(route, d) if route else True
+    return {
+        "value": d.isoformat(),
+        "label": f"{label}（{WEEKDAY_JA[d.weekday()]}）" if label else date_label(d),
+        "sub": date_label(d) if label else "",
+        "runs": runs,
+        "direct": bool(guide and runs and WEEKDAY_KEYS[d.weekday()] in guide["days"]),
+        "next_run": next_run,
+    }
+
+
 def date_choices(settings, today, guide=None):
-    labels = ["今日", "明日", "あさって"]
-    choices = []
     route = find_route(settings["route_id"]) if settings.get("mode") == "bus" else None
-    for i, label in enumerate(labels):
-        d = today + timedelta(days=i)
-        runs = community_runs(route, d) if route else True
-        direct = bool(guide and runs and WEEKDAY_KEYS[d.weekday()] in guide["days"])
-        choices.append({
-            "value": d.isoformat(), "label": f"{label}（{WEEKDAY_JA[d.weekday()]}）",
-            "sub": date_label(d), "runs": runs, "direct": direct,
-        })
+    choices = [day_choice(route, guide, today + timedelta(days=i), label)
+               for i, label in enumerate(["今日", "明日", "あさって"])]
+    if route and not any(c["runs"] for c in choices):
+        d = next_bus_day(settings, today)
+        if d:
+            choices.append(day_choice(route, guide, d, next_run=True))
     return choices
+
+
+def later_choices(settings, today, guide, shown, days=42):
+    """「それ以外の日」で選べる、あさってより先の日"""
+    route = find_route(settings["route_id"]) if settings.get("mode") == "bus" else None
+    taken = {c["value"] for c in shown}
+    return [c for c in (day_choice(route, guide, today + timedelta(days=i)) for i in range(3, days))
+            if c["value"] not in taken]
 
 
 def next_direct_day(settings, today, guide):

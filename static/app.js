@@ -2,28 +2,106 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// 画面の下の犬: さわると1回はねる
+// 画面の下のおじいちゃんとおばあちゃん: 画面の下が見えたら中尊寺まで歩き、さわると1回はねる
 document.querySelectorAll(".footer-dog").forEach((dog) => {
   dog.addEventListener("click", () => {
     dog.classList.remove("hop");
     void dog.offsetWidth;
     dog.classList.add("hop");
   });
-});
 
-// 「それ以外の日」を選んだら日付の入力欄を出す
-document.querySelectorAll("input[name='date']").forEach((radio) => {
-  radio.addEventListener("change", () => {
-    const otherRadio = document.querySelector("[data-other-date]");
-    const input = document.querySelector(".date-input");
-    if (!otherRadio || !input) return;
-    input.hidden = !otherRadio.checked;
-    input.required = otherRadio.checked;
-    if (otherRadio.checked) input.focus();
+  const footer = dog.closest(".dog-footer");
+  const temple = footer?.querySelector("[data-chusonji]");
+  if (!footer || !temple) return;
+
+  const SPEED = 26;
+  let started = false;
+
+  const targetLeft = () => {
+    const t = temple.getBoundingClientRect();
+    const f = footer.getBoundingClientRect();
+    const center = t.left + t.width / 2 - f.left + 40;
+    return Math.max(4, Math.min(center - dog.offsetWidth / 2, f.width - dog.offsetWidth - 6));
+  };
+
+  const arrive = () => {
+    dog.classList.remove("walking");
+    dog.classList.add("arrived");
+  };
+
+  const start = () => {
+    if (started) return;
+    started = true;
+    const to = targetLeft();
+    if (reduceMotion) {
+      dog.style.transitionDuration = "0s";
+      dog.style.left = `${to}px`;
+      arrive();
+      return;
+    }
+    const distance = dog.offsetLeft - to;
+    if (distance <= 0) {
+      arrive();
+      return;
+    }
+    dog.style.transitionDuration = `${distance / SPEED}s`;
+    dog.classList.add("walking");
+    dog.style.left = `${to}px`;
+  };
+
+  dog.addEventListener("transitionend", (e) => {
+    if (e.propertyName === "left") arrive();
+  });
+
+  new IntersectionObserver((entries, observer) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      observer.disconnect();
+      setTimeout(start, 400);
+    }
+  }, { threshold: 0.6 }).observe(footer);
+
+  window.addEventListener("resize", () => {
+    if (!dog.classList.contains("arrived")) return;
+    dog.style.transitionDuration = "0s";
+    dog.style.left = `${targetLeft()}px`;
   });
 });
 
-// おでかけの道のり: 犬が家から行き先まで歩く
+// 画面の下の景色: 東北本線の電車とコミュニティバスがときどき通る
+const scenery = document.querySelector(".scenery");
+
+if (scenery && !reduceMotion) {
+  const VIEW_W = 1200;
+  const VIEW_H = 112;
+
+  const visibleRange = () => {
+    const r = scenery.getBoundingClientRect();
+    const scale = Math.max(r.width / VIEW_W, r.height / VIEW_H);
+    const half = r.width / scale / 2;
+    return [VIEW_W / 2 - half, VIEW_W / 2 + half];
+  };
+
+  const drive = (el, { direction, speed, firstDelay, gap }) => {
+    if (!el) return;
+    const run = () => {
+      const [left, right] = visibleRange();
+      const length = el.getBBox().width;
+      const start = direction < 0 ? right + 10 : left - length - 10;
+      const end = direction < 0 ? left - length - 10 : right + 10;
+      const animation = el.animate(
+        [{ transform: `translateX(${start}px)` }, { transform: `translateX(${end}px)` }],
+        { duration: (Math.abs(end - start) / speed) * 1000, easing: "linear", fill: "both" },
+      );
+      animation.finished.then(() => setTimeout(run, gap[0] + Math.random() * (gap[1] - gap[0])));
+    };
+    setTimeout(run, firstDelay);
+  };
+
+  drive(scenery.querySelector("#train"), { direction: -1, speed: 70, firstDelay: 1500, gap: [5000, 11000] });
+  drive(scenery.querySelector("#bus"), { direction: 1, speed: 30, firstDelay: 3500, gap: [4000, 9000] });
+}
+
+// おでかけの道のり: おじいちゃんとおばあちゃんが家から行き先まで歩く
 const journey = document.querySelector("[data-journey]");
 
 if (journey) {
@@ -62,6 +140,7 @@ if (journey) {
   const showArrived = () => {
     walker.style.transition = "none";
     moveTo(steps.length - 1);
+    walker.classList.add("arrived");
     steps.forEach((s) => s.classList.add("reached"));
     say(journey.dataset.arrive);
   };

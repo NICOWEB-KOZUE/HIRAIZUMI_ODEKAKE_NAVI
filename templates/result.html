@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, emoji_icon %}
 
 {% block back %}<a class="back-link" href="{{ url_for('when', origin=origin, place=place_id) }}">もどる</a>{% endblock %}
 
 {% macro leg_row(leg) %}
   <li class="leg leg-{{ leg.kind }}">
-    <span class="leg-icon">{{ leg.icon }}</span>
+    <span class="leg-icon">{{ emoji_icon(leg.icon) }}</span>
     <div class="leg-body">
       {% if leg.kind == "ride" %}
         <div class="leg-times">
@@ -25,7 +26,8 @@
 <h1 class="title">利用できる移動手段</h1>
 <p class="lead">
   <strong>{{ plan.place.name }}</strong><br>
-  {{ plan.date_label }} {{ plan.period_label }}／出発: {{ origin_label }}
+  <span class="nowrap">{{ plan.date_label }} {{ plan.period_label }}</span><br>
+  出発: {{ origin_label }}
 </p>
 
 {% for n in plan.notices %}
@@ -40,13 +42,13 @@
     <div class="journey-line"></div>
     {% for step in plan.journey %}
       <div class="journey-step">
-        <span class="journey-icon">{{ step.icon }}</span>
+        <span class="journey-icon">{{ emoji_icon(step.icon) }}</span>
         <span class="journey-label">{{ step.label }}</span>
       </div>
     {% endfor %}
     <div class="walker" aria-hidden="true">
       <span class="bubble" hidden></span>
-      <span class="walker-dog">🐕</span>
+      <span class="walker-dog">{% include "_couple.html" %}</span>
     </div>
   </div>
   <button type="button" class="replay-button" data-replay>もう一度見る</button>
@@ -59,7 +61,7 @@
   <article class="candidate {% if c.recommended %}recommended{% endif %}">
     <h3 class="candidate-title">{{ c.label }}</h3>
 
-    {% for w in c.warnings %}<p class="notice notice-warn">⚠️ {{ w }}</p>{% endfor %}
+    {% for w in c.warnings %}<p class="notice notice-warn"><span class="inline-icon">{{ icon("warn") }}</span>{{ w }}</p>{% endfor %}
     {% if c.info %}<p class="notice notice-ok">{{ c.info }}</p>{% endif %}
 
     <div class="trip-part">
@@ -75,7 +77,7 @@
     {% if c.back %}
     <div class="trip-part">
       <h4 class="trip-heading">帰り</h4>
-      {% for w in c.back_warnings %}<p class="notice notice-warn">⚠️ {{ w }}</p>{% endfor %}
+      {% for w in c.back_warnings %}<p class="notice notice-warn"><span class="inline-icon">{{ icon("warn") }}</span>{{ w }}</p>{% endfor %}
       {% if c.back_note %}<p class="notice notice-info">{{ c.back_note }}</p>{% endif %}
       <ol class="legs">{% for leg in c.back %}{{ leg_row(leg) }}{% endfor %}</ol>
       {% if c.fare_back %}<p class="fare">運賃: {{ c.fare_back }}</p>{% endif %}
@@ -92,23 +94,26 @@
 <div class="transport-list">
   {% for t in plan.transports %}
     <section class="transport">
-      <h3 class="transport-name">{{ t.icon }} {{ t.name }}</h3>
+      <h3 class="transport-name"><span class="inline-icon">{{ emoji_icon(t.icon) }}</span>{{ t.name }}</h3>
       {% if t.fare %}<p class="transport-fare">{{ t.fare }}</p>{% endif %}
       {% if t.note %}<p class="transport-note">{{ t.note }}</p>{% endif %}
+      {% set phones = t.phones if t.icon == "🚕" else [] %}
+      {% if phones or t.times %}
       <div class="transport-actions">
-        {% for p in t.phones %}
-          <a class="action-button call" href="tel:{{ p.number }}">📞 電話する<small>{{ p.label }}</small></a>
+        {% for p in phones %}
+          <a class="action-button call" href="tel:{{ p.number }}"><span class="action-label"><span class="inline-icon">{{ icon("call") }}</span>電話する</span><small>{{ p.label }}</small></a>
         {% endfor %}
         {% if t.times %}
-          <a class="action-button times" href="{{ url_for('times', kind=t.times) }}">🕘 時刻を見る</a>
+          <a class="action-button times" href="{{ url_for('times', kind=t.times) }}"><span class="action-label"><span class="inline-icon">{{ icon("clock") }}</span>時刻表を見る</span></a>
         {% endif %}
       </div>
+      {% endif %}
     </section>
   {% endfor %}
 </div>
 {% endif %}
 
 <div class="quiet-area">
-  <a class="big-button" href="{{ url_for('index') }}"><span class="icon">🏠</span><span>最初の画面にもどる</span></a>
+  <a class="big-button" href="{{ url_for('index') }}"><span class="icon">{{ icon("home") }}</span><span>最初の画面にもどる</span></a>
 </div>
 {% endblock %}

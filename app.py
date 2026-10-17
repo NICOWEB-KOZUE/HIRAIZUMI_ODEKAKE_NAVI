@@ -42,6 +42,38 @@ def hhmm_filter(minutes):
     return planner.to_hhmm(minutes) if minutes is not None else ""
 
 
+SEASONS = ("spring", "summer", "autumn", "winter")
+
+
+def season_of(day):
+    if day.month in (4, 5):
+        return "spring"
+    if day.month in (6, 7, 8):
+        return "summer"
+    if day.month in (9, 10, 11):
+        return "autumn"
+    return "winter"
+
+
+def page_season(day=None):
+    requested = request.args.get("season")
+    if requested in SEASONS:
+        return requested
+    return season_of(day or date.today())
+
+
+@app.context_processor
+def inject_season():
+    return {"season": page_season()}
+
+
+@app.template_global()
+def static_url(filename):
+    path = Path(app.static_folder) / filename
+    version = int(path.stat().st_mtime) if path.exists() else 0
+    return url_for("static", filename=filename, v=version)
+
+
 @app.route("/")
 def index():
     settings = load_settings()
@@ -98,17 +130,16 @@ def when():
         return redirect(url_for("index"))
     origin = request.args.get("origin", "home")
     today = date.today()
-    next_day = planner.next_bus_day(settings, today)
     guide = planner.direct_guide(settings, origin, place)
     choices = planner.date_choices(settings, today, guide)
-    selected = next((c["value"] for c in choices if c["direct"]),
-                    next((c["value"] for c in choices if c["runs"]), choices[0]["value"]))
+    later = planner.later_choices(settings, today, guide, choices)
+    nearby = [c for c in choices if not c["next_run"]]
+    selected = next((c["value"] for c in nearby if c["direct"]),
+                    next((c["value"] for c in nearby if c["runs"]), nearby[0]["value"]))
     direct_day = planner.next_direct_day(settings, today, guide)
     return render_template("when.html", origin=origin, place=place,
-                           choices=choices, selected=selected, guide=guide,
+                           choices=choices, later=later, selected=selected, guide=guide,
                            next_direct_day=planner.date_label(direct_day) if direct_day else None,
-                           today=today.isoformat(),
-                           next_bus_day=planner.date_label(next_day) if next_day else None,
                            uses_bus=settings.get("mode") == "bus")
 
 
@@ -127,8 +158,6 @@ def result():
     if period not in planner.PERIOD_START:
         period = "am"
     date_text = request.args.get("date", "")
-    if date_text == "other":
-        date_text = request.args.get("other_date", "")
     try:
         day = date.fromisoformat(date_text)
     except ValueError:
@@ -137,7 +166,7 @@ def result():
     plan = planner.plan(settings, origin, place_id, day, period)
     origin_label = home_label(settings) if origin == "home" else origin
     return render_template("result.html", plan=plan, origin_label=origin_label,
-                           origin=origin, place_id=place_id)
+                           origin=origin, place_id=place_id, season=page_season(day))
 
 
 TIMES_PAGES = {

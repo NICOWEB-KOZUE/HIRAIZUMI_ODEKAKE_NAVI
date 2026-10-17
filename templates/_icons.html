@@ -1,0 +1,172 @@
+{% macro icon(name) %}
+<svg class="hand-icon" viewBox="0 0 48 48" aria-hidden="true">
+<g stroke="#5b3d2e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+{% if name == "hospital" %}
+  <rect x="8" y="12" width="32" height="28" rx="3" fill="#fff8ef"/>
+  <g fill="#bfe0f0">
+    <rect x="12" y="16" width="5" height="5" rx="1"/>
+    <rect x="31" y="16" width="5" height="5" rx="1"/>
+    <rect x="12" y="26" width="5" height="5" rx="1"/>
+    <rect x="31" y="26" width="5" height="5" rx="1"/>
+    <rect x="20" y="30" width="8" height="10"/>
+  </g>
+  <circle cx="24" cy="20" r="5.5" fill="#fff"/>
+  <path d="M24 17 V23 M21 20 H27" stroke="#e04b3c" stroke-width="2.6"/>
+  <path d="M5 40 H43"/>
+{% elif name == "shopping" %}
+  <path d="M12 21 Q24 1 36 21" fill="none"/>
+  <path d="M20 23 L13 8" stroke="#6fae55" stroke-width="4"/>
+  <path d="M14.2 10.6 L12 6" stroke="#9ed07f" stroke-width="4"/>
+  <circle cx="30" cy="19" r="5" fill="#e8574a"/>
+  <path d="M30 14 Q32 11 34.5 12" fill="none" stroke="#6fae55"/>
+  <path d="M8 21 H40 L36 39 Q35.5 41 33.5 41 H14.5 Q12.5 41 12 39Z" fill="#e9b877"/>
+  <path d="M10.5 28 H37.5 M12 34 H36" stroke="#b98246" stroke-width="1.4"/>
+{% elif name == "town_office" %}
+  <rect x="6" y="22" width="36" height="18" rx="1.5" fill="#f4e4c8"/>
+  <rect x="17" y="12" width="14" height="28" fill="#f4e4c8"/>
+  <path d="M15 12 L24 5 L33 12Z" fill="#7c9a6a"/>
+  <circle cx="24" cy="19" r="3.8" fill="#fff"/>
+  <path d="M24 17 V19 H25.8" stroke-width="1.4"/>
+  <g fill="#bfe0f0">
+    <rect x="9" y="26" width="5" height="5" rx="1"/>
+    <rect x="34" y="26" width="5" height="5" rx="1"/>
+  </g>
+  <rect x="20" y="30" width="8" height="10" fill="#a8774f"/>
+  <path d="M4 40 H44"/>
+{% elif name == "post_bank" %}
+  <path d="M14 40 V16 Q14 7 24 7 Q34 7 34 16 V40Z" fill="#e0473a"/>
+  <rect x="17" y="16" width="14" height="3" rx="1.2" fill="#5b3d2e" stroke="none"/>
+  <rect x="18" y="23" width="12" height="10" rx="1.5" fill="#fff"/>
+  <path d="M21 25.8 H27 M21 28 H27 M24 28 V31.2" stroke="#e0473a" stroke-width="1.6"/>
+  <rect x="12" y="39" width="24" height="3.5" rx="1" fill="#8a6a55"/>
+{% elif name == "onsen" %}
+  <path d="M17 21 Q14 17.5 17 14 Q20 10.5 17 7" fill="none" stroke="#e86a5a" stroke-width="2.4"/>
+  <path d="M24 21 Q21 17 24 13 Q27 9 24 5" fill="none" stroke="#e86a5a" stroke-width="2.4"/>
+  <path d="M31 21 Q28 17.5 31 14 Q34 10.5 31 7" fill="none" stroke="#e86a5a" stroke-width="2.4"/>
+  <path d="M9 25 H39 L35.5 41 H12.5Z" fill="#e8c48e"/>
+  <ellipse cx="24" cy="25" rx="14" ry="2.2" fill="#a9dcef" stroke-width="1.6"/>
+  <path d="M10.6 31 H37.4 M11.8 36.5 H36.2" stroke="#a8774f" stroke-width="1.8"/>
+{% elif name == "station" %}
+  <path d="M20 7 L24 3 L28 7 M19 3 H29" fill="none" stroke-width="1.6"/>
+  <rect x="11" y="7" width="26" height="30" rx="6" fill="#eef1f5"/>
+  <rect x="15" y="11" width="18" height="10" rx="2.5" fill="#5c7286"/>
+  <rect x="12" y="25" width="24" height="2.6" fill="#7b4fa0" stroke="none"/>
+  <rect x="12" y="27.6" width="24" height="2.4" fill="#e0569a" stroke="none"/>
+  <circle cx="16" cy="33" r="1.6" fill="#ffe27a" stroke-width="1.2"/>
+  <circle cx="32" cy="33" r="1.6" fill="#ffe27a" stroke-width="1.2"/>
+  <path d="M16 37 L14 41 M32 37 L34 41 M5 41 H43"/>
+{% elif name == "home" %}
+  <rect x="11" y="24" width="26" height="16" fill="#fff3df"/>
+  <path d="M11 32 H37 M19 24 V40 M29 24 V40" stroke="#8a5a3c" stroke-width="1.4"/>
+  <rect x="21" y="31" width="6" height="9" fill="#a8774f"/>
+  <path d="M5 26 L17 9 H31 L43 26Z" fill="#d9b26a"/>
+  <path d="M12.5 20.5 L18 13 M35.5 20.5 L30 13 M24 13 V22" stroke="#b48a45" stroke-width="1.2"/>
+  <rect x="16" y="7" width="16" height="3.5" rx="1.5" fill="#7c5a3e"/>
+  <path d="M5 40 H43"/>
+{% elif name == "phone" %}
+  <path d="M10 38 L14 24 H34 L38 38 Q38 40 36 40 H12 Q10 40 10 38Z" fill="#f2e3c9"/>
+  <circle cx="24" cy="32" r="5" fill="#fff"/>
+  <circle cx="24" cy="32" r="1.4" fill="#5b3d2e" stroke="none"/>
+  <path d="M8 19 Q8 12 24 12 Q40 12 40 19 V21 Q40 23 38 23 H33 Q31 23 31 21 V19 H17 V21 Q17 23 15 23 H10 Q8 23 8 21Z" fill="#6fae55"/>
+{% elif name == "stop" %}
+  <path d="M24 25 V40" stroke-width="2.6"/>
+  <rect x="19" y="27" width="10" height="8" rx="1" fill="#fff"/>
+  <path d="M21 30 H27 M21 32.5 H25" stroke-width="1.2"/>
+  <rect x="17" y="39" width="14" height="3.5" rx="1.5" fill="#b8c0c8"/>
+  <circle cx="24" cy="14" r="11" fill="#f29a3d"/>
+  <circle cx="24" cy="14" r="7.5" fill="#fff" stroke="none"/>
+  <rect x="19.5" y="10.5" width="9" height="6.5" rx="1.5" fill="#f29a3d" stroke="none"/>
+  <rect x="20.8" y="11.8" width="6.4" height="2.2" fill="#fff" stroke="none"/>
+  <circle cx="21.5" cy="17.4" r="1.1" fill="#5b3d2e" stroke="none"/>
+  <circle cx="26.5" cy="17.4" r="1.1" fill="#5b3d2e" stroke="none"/>
+{% elif name == "bus" %}
+  <path d="M5 34 V16 Q5 12 9 12 H37 Q43 12 43 18 V34Z" fill="#fff4dc"/>
+  <g fill="#bfe0f0" stroke-width="1.6">
+    <rect x="9" y="16" width="6" height="6" rx="1"/>
+    <rect x="17" y="16" width="6" height="6" rx="1"/>
+    <rect x="25" y="16" width="6" height="6" rx="1"/>
+    <path d="M34 16 H38 Q40 16 40.5 18.5 L41 22 H34Z"/>
+  </g>
+  <rect x="6" y="25" width="36" height="3" fill="#f29a3d" stroke="none"/>
+  <circle cx="41" cy="30.5" r="1.2" fill="#ffe27a" stroke="none"/>
+  <circle cx="14" cy="35" r="4" fill="#5b3d2e"/>
+  <circle cx="34" cy="35" r="4" fill="#5b3d2e"/>
+  <circle cx="14" cy="35" r="1.4" fill="#ddd" stroke="none"/>
+  <circle cx="34" cy="35" r="1.4" fill="#ddd" stroke="none"/>
+{% elif name == "train" %}
+  <path d="M5 41 H43"/>
+  <path d="M20 13 L24 8 L28 13 M19 8 H29" fill="none" stroke-width="1.6"/>
+  <path d="M9 13 H43 V36 H4 V22 Q4 13 9 13Z" fill="#eef1f5"/>
+  <path d="M5 22 Q5.5 16 9.5 16 H12 V22Z" fill="#4d6070" stroke-width="1.4"/>
+  <g fill="#5c7286" stroke-width="1.4">
+    <rect x="16" y="17" width="7" height="6" rx="1"/>
+    <rect x="26" y="17" width="7" height="6" rx="1"/>
+    <rect x="36" y="17" width="5" height="6" rx="1"/>
+  </g>
+  <rect x="5" y="27" width="37" height="2.6" fill="#7b4fa0" stroke="none"/>
+  <rect x="5" y="29.6" width="37" height="2.4" fill="#e0569a" stroke="none"/>
+  <circle cx="7.5" cy="33.5" r="1.2" fill="#ffe27a" stroke="none"/>
+  <circle cx="13" cy="38" r="2.6" fill="#5b3d2e"/>
+  <circle cx="35" cy="38" r="2.6" fill="#5b3d2e"/>
+{% elif name == "taxi" %}
+  <rect x="20" y="9" width="9" height="5" rx="1" fill="#fff"/>
+  <path d="M4 33 V26 Q4 23 7 22.5 L13 21.5 L17 15.5 Q18 14 20 14 H30 Q32 14 33 15.5 L37 21.5 L42 22.5 Q44 23 44 26 V33Z" fill="#ffd86b"/>
+  <g fill="#bfe0f0" stroke-width="1.4">
+    <path d="M19.5 16.5 H24 V21.5 H16Z"/>
+    <path d="M26 16.5 H30 Q31 16.5 31.6 17.4 L34.5 21.5 H26Z"/>
+  </g>
+  <path d="M4.5 27 H43.5" stroke="#e0573a" stroke-width="1.6"/>
+  <circle cx="42" cy="25" r="1" fill="#fff" stroke="none"/>
+  <circle cx="13" cy="34" r="4" fill="#5b3d2e"/>
+  <circle cx="35" cy="34" r="4" fill="#5b3d2e"/>
+  <circle cx="13" cy="34" r="1.4" fill="#ddd" stroke="none"/>
+  <circle cx="35" cy="34" r="1.4" fill="#ddd" stroke="none"/>
+{% elif name == "walk" %}
+  <path d="M21 31 L16.5 41 M24.5 31 L28.5 41" stroke-width="3"/>
+  <path d="M31.5 24.5 L34 41" stroke="#8a5a3c" stroke-width="2.4"/>
+  <rect x="17.5" y="16" width="9" height="16" rx="3.5" fill="#5b86b5"/>
+  <path d="M20 19 L15.5 27 M24.5 19 L31.5 24.5" stroke-width="2.6"/>
+  <circle cx="22" cy="10.5" r="5" fill="#f6d2b0"/>
+  <path d="M16.5 9 Q22 2.5 27.5 9Z" fill="#8a5a3c"/>
+{% elif name == "pin" %}
+  <ellipse cx="24" cy="43" rx="7" ry="1.8" fill="#e6d8bd" stroke="none"/>
+  <path d="M24 42 C24 42 11 28 11 18 A13 13 0 0 1 37 18 C37 28 24 42 24 42Z" fill="#e0573a"/>
+  <circle cx="24" cy="18" r="5" fill="#fff"/>
+{% elif name == "warn" %}
+  <path d="M24 6 Q26 6 27.2 8 L43 36 Q44 39 41 39.5 H7 Q4 39 5 36 L20.8 8 Q22 6 24 6Z" fill="#ffd447"/>
+  <path d="M24 17 V27" stroke-width="3.6"/>
+  <circle cx="24" cy="33" r="2.2" fill="#5b3d2e" stroke="none"/>
+{% elif name == "call" %}
+  <path d="M14 7 Q17 6 18.5 8.5 L22 15 Q23 17.5 21 19 L18.5 21 Q20.5 27.5 27 29.5 L29 27 Q30.5 25 33 26 L39.5 29.5 Q42 31 41 34 L39.5 38 Q38.5 41 35 41 Q10 39 7 13 Q7 9.5 10 8.5Z" fill="#fff4dc"/>
+  <path d="M29 9 Q37 10 39 19 M29 15 Q32.5 15.5 33.5 19" fill="none" stroke="#fff4dc" stroke-width="2.4"/>
+{% elif name == "clock" %}
+  <circle cx="24" cy="25" r="16" fill="#fff"/>
+  <g stroke-width="1.8">
+    <path d="M24 12 V14.5 M24 35.5 V38 M11 25 H13.5 M34.5 25 H37"/>
+  </g>
+  <path d="M24 25 V17 M24 25 L30 28" stroke="#1a4f8f" stroke-width="2.6"/>
+  <circle cx="24" cy="25" r="1.8" fill="#5b3d2e" stroke="none"/>
+  <path d="M12 9 L8 13 M36 9 L40 13" stroke-width="2.6"/>
+{% elif name == "morning" %}
+  <path d="M24 13 V9 M13 18 L10.5 15.5 M35 18 L37.5 15.5 M8 25 H5 M40 25 H43" stroke="#f2a03d" stroke-width="2.4"/>
+  <circle cx="24" cy="28" r="9" fill="#ffc36b"/>
+  <path d="M4 40 V32 Q14 24 22 31 Q30 24 44 30 V40Z" fill="#a6d68a"/>
+{% elif name == "afternoon" %}
+  <path d="M24 4 V8.5 M24 39.5 V44 M4 24 H8.5 M39.5 24 H44 M10 10 L13.2 13.2 M38 38 L34.8 34.8 M38 10 L34.8 13.2 M10 38 L13.2 34.8" stroke="#f2a03d" stroke-width="2.4"/>
+  <circle cx="24" cy="24" r="11" fill="#ffd447"/>
+  <circle cx="20.5" cy="22.5" r="1.3" fill="#7a5a3a" stroke="none"/>
+  <circle cx="27.5" cy="22.5" r="1.3" fill="#7a5a3a" stroke="none"/>
+  <path d="M20.5 27 Q24 30 27.5 27" fill="none" stroke="#7a5a3a" stroke-width="1.5"/>
+  <circle cx="17.5" cy="27" r="1.8" fill="#f59a8a" opacity="0.6" stroke="none"/>
+  <circle cx="30.5" cy="27" r="1.8" fill="#f59a8a" opacity="0.6" stroke="none"/>
+{% endif %}
+</g>
+</svg>
+{% endmacro %}
+
+{% macro emoji_icon(emoji) %}
+{%- set names = {"🚌": "bus", "🚃": "train", "🚕": "taxi", "🚶": "walk", "🚏": "stop", "🏠": "home",
+                 "📍": "pin", "🏥": "hospital", "🛒": "shopping", "🏛️": "town_office",
+                 "📮": "post_bank", "♨️": "onsen", "🚉": "station"} -%}
+{%- if emoji in names %}{{ icon(names[emoji]) }}{% else %}{{ emoji }}{% endif -%}
+{% endmacro %}
