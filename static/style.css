@@ -647,6 +647,67 @@ a { color: inherit; }
 .grandpa .cap { fill: #8b5a32; }
 .grandpa .brim { fill: #6e4424; }
 
+/* 冬: ニット帽とマフラー、あたたかい色のコート */
+.couple.winter .bun,
+.couple.winter .cap,
+.couple.winter .brim { display: none; }
+
+.couple.winter .grandma .body { fill: #9c4a5e; }
+.couple.winter .grandma .arm-front path,
+.couple.winter .grandma .front-arm { stroke: #8a3f52; }
+.couple.winter .grandma .arm-back path { stroke: #733445; }
+.couple.winter .grandma .hat { fill: #e8879c; }
+.couple.winter .grandma .hat-band { fill: #cf6c84; }
+.couple.winter .grandma .pompom { fill: #f6c3cf; }
+.couple.winter .grandma .scarf { fill: #e2574c; }
+
+.couple.winter .grandpa .body { fill: #5b4a3c; }
+.couple.winter .grandpa .arm-front path,
+.couple.winter .grandpa .front-arm { stroke: #4e3f33; }
+.couple.winter .grandpa .arm-back path { stroke: #3e3229; }
+.couple.winter .grandpa .hat { fill: #d9a441; }
+.couple.winter .grandpa .hat-band { fill: #c18c2e; }
+.couple.winter .grandpa .pompom { fill: #f1d48a; }
+.couple.winter .grandpa .scarf { fill: #4f8a5b; }
+
+/* 春: うすいカーディガンとベージュのジャケット。中に白い服が見える */
+.couple.spring .grandma .body { fill: #f2c400; }
+.couple.spring .grandma .arm-front path,
+.couple.spring .grandma .front-arm { stroke: #e0b000; }
+.couple.spring .grandma .arm-back path { stroke: #c99a00; }
+.couple.spring .grandma .inner { fill: #fff8f2; }
+.couple.spring .grandma .front .bun { display: none; }
+.couple.spring .grandma .spring-hat { fill: #fff4d8; }
+.couple.spring .grandma .spring-brim { fill: #f0e0b4; }
+.couple.spring .grandma .spring-band { fill: #6aaf55; }
+
+.couple.spring .grandpa .body { fill: #c6a56e; }
+.couple.spring .grandpa .arm-front path,
+.couple.spring .grandpa .front-arm { stroke: #b08f58; }
+.couple.spring .grandpa .arm-back path { stroke: #967848; }
+.couple.spring .grandpa .inner { fill: #f7f1e6; }
+
+/* 夏: 半袖。腕は肌の色で、肩だけ服の色 */
+.couple.summer .sleeve {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 6.5;
+}
+
+.couple.summer .grandma .body { fill: #e86b95; }
+.couple.summer .grandma .arm path,
+.couple.summer .grandma .front-arm { stroke: #f6d0b0; }
+.couple.summer .grandma .arm-back path { stroke: #e2b896; }
+.couple.summer .grandma .arm path.sleeve,
+.couple.summer .grandma .sleeve { stroke: #e86b95; }
+
+.couple.summer .grandpa .body { fill: #8ec6e4; }
+.couple.summer .grandpa .arm path,
+.couple.summer .grandpa .front-arm { stroke: #f6d0b0; }
+.couple.summer .grandpa .arm-back path { stroke: #e2b896; }
+.couple.summer .grandpa .arm path.sleeve,
+.couple.summer .grandpa .sleeve { stroke: #8ec6e4; }
+
 /* 立っているときの足と手 */
 .couple .leg-front { transform: rotate(-7deg); }
 .couple .leg-back { transform: rotate(7deg); }
@@ -677,6 +738,19 @@ a { color: inherit; }
 .footer-dog.walking .couple .arm {
   animation: arm-swing var(--gait) ease-in-out infinite;
   animation-delay: calc(var(--phase) + var(--offset));
+}
+
+/* 夏の日傘: 差している腕は歩いても振らない */
+.couple .parasol .canopy { fill: #ffe7a3; stroke: #f3a9c0; stroke-width: 1.1; }
+.couple .parasol .rib { fill: none; stroke: #f3a9c0; stroke-width: 0.7; }
+.couple .parasol .knob { fill: #f3a9c0; }
+.couple .parasol .handle { fill: none; stroke: #b08968; stroke-width: 1.4; stroke-linecap: round; }
+
+.couple.summer .grandma .arm-front,
+.walker.walking .couple.summer .grandma .arm-front,
+.footer-dog.walking .couple.summer .grandma .arm-front {
+  animation: none;
+  transform: none;
 }
 
 .walker.walking .couple .person,
@@ -954,6 +1028,48 @@ a { color: inherit; }
 
 .scenery .snow { animation-name: snowfall; }
 
+/* お神輿: 「わっしょい」と上下にゆれる */
+.scenery .mikoshi-man,
+.scenery .mikoshi-shrine {
+  animation: mikoshi-bob 0.35s ease-in-out infinite alternate;
+}
+
+/* 担ぎ手の足: 腰を軸に左右交互に前後へ振る */
+.scenery .mikoshi-leg {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: mikoshi-step 0.7s ease-in-out infinite;
+}
+
+.scenery .mikoshi-leg.back { animation-delay: -0.35s; }
+
+@keyframes mikoshi-step {
+  0%, 100% { transform: rotate(-24deg); }
+  50% { transform: rotate(24deg); }
+}
+
+.scenery .mikoshi-shrine {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation-name: mikoshi-sway;
+}
+
+@keyframes mikoshi-bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1.2px); }
+}
+
+@keyframes mikoshi-sway {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-1.4px) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenery .mikoshi-man,
+  .scenery .mikoshi-shrine,
+  .scenery .mikoshi-leg { animation: none; }
+}
+
 @keyframes fall {
   0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
   10% { opacity: 1; }
@@ -995,50 +1111,15 @@ a { color: inherit; }
   80% { transform: translateY(-5px); }
 }
 
-/* ---------- 左右の余白の季節の飾り（動かない） ---------- */
+/* ---------- 画面全体にうすく敷く季節の背景（動かない） ---------- */
 
-.side-deco { display: none; }
-
-@media (min-width: 800px) {
-  .side-deco {
-    display: block;
-    position: fixed;
-    inset: 70px 0 140px;
-    pointer-events: none;
-  }
-
-  .side-deco-strip {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: calc((100% - 640px) / 2);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-
-  .side-deco-strip.left { left: 0; }
-  .side-deco-strip.right { right: 0; }
-
-  .side-deco-branch {
-    display: block;
-    width: min(100%, 190px);
-    height: auto;
-    max-height: 100%;
-    opacity: 0.8;
-  }
-
-  .side-deco-strip.right .side-deco-branch {
-    align-self: flex-end;
-    width: min(85%, 160px);
-    transform: scaleX(-1);
-  }
-
-  .app-header,
-  .page,
-  .dog-footer { position: relative; z-index: 1; }
-
-  .app-header { position: sticky; z-index: 10; }
+.soft-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* ---------- 動きを減らす設定の人 ---------- */

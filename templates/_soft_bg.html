@@ -1,0 +1,109 @@
+{# 画面全体にうっすら敷く背景。季節の大きな絵を少しと小さな絵をまばらに、ぼかした光の玉。動かない #}
+{# big / small は使う絵、big_div / small_div は大きさの割り方、stroke は線で描く絵かどうか #}
+{% set palettes = {
+  "spring": {"big": ["sakura"], "big_div": 34, "small": "petal", "small_div": 24, "stroke": false,
+             "colors": ["#e2b3ba", "#eac4c9", "#d9a5ad"], "bokeh": "#f3dade"},
+  "summer": {"big": ["fukinagashi", "kingyo"], "big_div": 30, "small": ["star", "bubble"], "small_div": 14, "stroke": false,
+             "colors": ["#9fc3d8", "#e3907e", "#e3cb8e", "#e8a46f"], "small_colors": ["#e6cf86", "#a9cde0"], "bokeh": "#d9e9f1"},
+  "autumn": {"big": ["momiji"], "big_div": 15, "small": "momiji", "small_div": 14, "stroke": false,
+             "colors": ["#d98a6e", "#e3a46f", "#cf7a62", "#e2b56f"], "bokeh": "#f3dccb"},
+  "winter": {"big": ["crystal"], "big_div": 30, "small": "snow", "small_div": 24, "stroke": false,
+             "colors": ["#a9c2d8", "#bccfe0", "#98b4cc"], "bokeh": "#dbe7f1"},
+} %}
+{% set p = palettes[season] %}
+{# (x, y, 大きさ, 傾き, 濃さ, 大きな絵か)。大きな絵は右上に3つ・左下に2つ、ほかは小さな絵をまばらに #}
+{% set layout = [
+  (1105, 140, 78, 8, 0.5, true), (1170, 300, 56, -20, 0.42, true), (975, 100, 44, 25, 0.35, true),
+  (70, 700, 62, 15, 0.42, true), (180, 780, 44, -10, 0.32, true),
+  (1035, 220, 26, 40, 0.4, false), (1190, 410, 22, -30, 0.35, false), (940, 195, 20, 10, 0.3, false),
+  (1075, 335, 18, 60, 0.3, false), (130, 648, 22, -40, 0.32, false), (232, 722, 18, 20, 0.28, false),
+  (90, 130, 24, 10, 0.28, false), (200, 300, 20, -30, 0.22, false), (60, 470, 24, 20, 0.25, false),
+  (232, 600, 18, 45, 0.2, false), (1000, 420, 22, -15, 0.22, false), (1130, 560, 24, 30, 0.25, false),
+  (980, 700, 18, 10, 0.2, false), (520, 40, 16, -20, 0.15, false), (700, 772, 18, 30, 0.15, false),
+] %}
+{% set bokeh = [(60, 140, 70, 0.55), (1140, 320, 90, 0.45), (40, 560, 60, 0.45), (1050, 720, 80, 0.4),
+                (300, 780, 50, 0.35), (880, 80, 60, 0.35), (250, 60, 40, 0.3)] %}
+
+<svg class="soft-bg season-{{ season }}" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="soft-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="soft-wash" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="60"/></filter>
+    <filter id="soft-leaf"><feGaussianBlur stdDeviation="0.5"/></filter>
+
+    {# 春 #}
+    <path id="soft-petal" d="M0 -9 L-5 -13 C-7 -12 -8 -9 -8 -5 C-8 2 -3 10 -0.8 12.8 C-0.3 13.3 0.3 13.3 0.8 12.8 C3 10 8 2 8 -5 C8 -9 7 -12 5 -13 Z"/>
+    <g id="soft-sakura">
+      {% for a in [0, 72, 144, 216, 288] %}
+        <path transform="rotate({{ a }})" d="M0 -3 C-6 -7 -10 -15 -8 -23 C-7 -27 -4 -29 -2 -28 L0 -25 L2 -28 C4 -29 7 -27 8 -23 C10 -15 6 -7 0 -3 Z"/>
+      {% endfor %}
+    </g>
+
+    {# 夏の仙台七夕の吹き流し（くす玉と長い紙の帯）と金魚、小さな星と泡 #}
+    <g id="soft-fukinagashi">
+      <path d="M0 -32 V-28" stroke="#b9a58a" stroke-width="0.8"/>
+      {% set strips = ["#e8b4bf", "#e9d08e", "#a9c8de", "#c2b5dc", "#b6d1a8", "#e8b4bf", "#e9d08e"] %}
+      {% for c in strips %}
+        {% set x0 = -9 + loop.index0 * 3 %}
+        {% set xb = x0 * 1.35 %}
+        <path fill="{{ c }}" d="M{{ x0 - 1.5 }} -12 L{{ x0 + 1.5 }} -12 Q{{ x0 + 2.5 }} 8 {{ xb + 1.7 }} 28 L{{ xb - 1.7 }} 28 Q{{ x0 + 0.5 }} 8 {{ x0 - 1.5 }} -12 Z"/>
+      {% endfor %}
+      <rect x="-11.5" y="-14" width="23" height="3.4" rx="1" fill="#d9a5ad"/>
+      <circle cy="-20" r="9" fill="#e8b4bf"/>
+      {% for x, y in [(-4, -23), (3, -25), (5, -18), (-2, -16), (-6, -18), (0, -20)] %}
+        <circle cx="{{ x }}" cy="{{ y }}" r="1.8" fill="#ffffff" opacity="0.55"/>
+      {% endfor %}
+    </g>
+    <path id="soft-star" d="M0.0 -10.0 L2.5 -3.4 L9.5 -3.1 L4.0 1.3 L5.9 8.1 L0.0 4.2 L-5.9 8.1 L-4.0 1.3 L-9.5 -3.1 L-2.5 -3.4 Z"/>
+    <g id="soft-kingyo" transform="translate(8 0)">
+      <path d="M10 0 C10 -6 4 -9 -2 -8 C-7 -7 -10 -3 -11 0 C-10 3 -7 7 -2 8 C4 9 10 6 10 0 Z"/>
+      <path d="M-9 0 C-14 -6 -20 -12 -26 -10 C-22 -6 -21 -2 -22 2 C-20 0 -17 0 -16 1 C-19 4 -22 9 -25 12 C-18 12 -13 6 -9 0 Z"/>
+      <path d="M-2 -8 C0 -12 4 -13 6 -11 C4 -10 3 -8 2 -8 Z"/>
+      <circle cx="6" cy="-2" r="1.4" fill="#ffffff" opacity="0.8"/>
+    </g>
+    <path id="soft-bubble" fill-rule="evenodd" d="M0 -6 A6 6 0 1 0 0.01 -6 Z M0 -4.4 A4.4 4.4 0 1 1 -0.01 -4.4 Z"/>
+
+    {# 秋 #}
+    <path id="soft-momiji" stroke-linejoin="round" d="M-1.6 3.3 L-3.0 4.1 L-4.2 4.3 L-4.0 3.1 L-3.3 1.7 L-3.8 1.7 L-5.6 1.9 L-8.0 1.4 L-9.5 0.3 L-8.0 -0.8 L-5.7 -1.5 L-3.9 -1.5 L-6.4 -3.2 L-7.9 -5.8 L-8.3 -8.0 L-6.1 -7.7 L-3.5 -6.2 L-1.6 -3.9 L-2.2 -7.1 L-1.4 -10.1 L0.0 -12.0 L1.4 -10.1 L2.2 -7.1 L1.6 -3.9 L3.5 -6.2 L6.1 -7.7 L8.3 -8.0 L7.9 -5.8 L6.4 -3.2 L3.9 -1.5 L5.7 -1.5 L8.0 -0.8 L9.5 0.3 L8.0 1.4 L5.6 1.9 L3.8 1.7 L3.3 1.7 L4.0 3.1 L4.2 4.3 L3.0 4.1 L1.6 3.3 L0.0 3.2 Z M-0.6 2.5 L0.6 2.5 L1.1 7.5 L0.1 7.8 Z"/>
+
+    {# 冬 #}
+    {# 丸い腕の先に玉、まん中に白い丸の、ころんとした結晶 #}
+    <g id="soft-crystal">
+      {% for a in range(0, 360, 60) %}
+        <g transform="rotate({{ a }})">
+          <rect x="-2" y="-19" width="4" height="15" rx="2"/>
+          <circle cy="-21.5" r="3.6"/>
+          <ellipse cy="-3.6" rx="1.8" ry="3.6" transform="translate(0 -11) rotate(48)"/>
+          <ellipse cy="-3.6" rx="1.8" ry="3.6" transform="translate(0 -11) rotate(-48)"/>
+        </g>
+      {% endfor %}
+      <circle r="7"/>
+      <circle r="3.6" fill="#ffffff" opacity="0.85"/>
+    </g>
+    {# 小さな雪は6つの丸を寄せた花のような形 #}
+    <g id="soft-snow">
+      {% for a in range(0, 360, 60) %}
+        <circle transform="rotate({{ a }})" cy="-5.5" r="2.6"/>
+      {% endfor %}
+      <circle r="3.4"/>
+    </g>
+  </defs>
+
+  <ellipse cx="600" cy="400" rx="420" ry="360" fill="#ffffff" opacity="0.55" filter="url(#soft-wash)"/>
+  <g fill="{{ p.bokeh }}" filter="url(#soft-blur)">
+    {% for x, y, r, o in bokeh %}<circle cx="{{ x }}" cy="{{ y }}" r="{{ r }}" opacity="{{ o }}"/>{% endfor %}
+  </g>
+  <g filter="url(#soft-leaf)">
+    {% for x, y, size, rot, o, big in layout %}
+      {% if big %}
+        {% set shape, c = p.big[loop.index0 % p.big | length], p.colors[loop.index0 % p.colors | length] %}
+      {% elif p.small is string %}
+        {% set shape, c = p.small, p.colors[loop.index0 % p.colors | length] %}
+      {% else %}
+        {% set shape, c = p.small[loop.index0 % p.small | length], p.small_colors[loop.index0 % p.small_colors | length] %}
+      {% endif %}
+      <use href="#soft-{{ shape }}" opacity="{{ o }}"
+           {% if p.stroke %}stroke="{{ c }}"{% else %}fill="{{ c }}"{% endif %}
+           transform="translate({{ x }} {{ y }}) rotate({{ rot }}) scale({{ size / (p.big_div if big else p.small_div) }})"/>
+    {% endfor %}
+  </g>
+</svg>

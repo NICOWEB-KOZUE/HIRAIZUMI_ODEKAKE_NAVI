@@ -18,6 +18,43 @@
   </g>
 {% endmacro %}
 
+{# 春の桜並木の1本。横に広がったふんわりした花の冠 #}
+{% macro sakura_tree(x, s=1) %}
+  <g transform="translate({{ x }} 99) scale({{ s }})">
+    <path d="M0 0 V-8 M0 -6 L-3.5 -10 M0 -7 L3.2 -10.5" stroke="#8a5a3c" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="-6.5" cy="-11.5" r="4.6" fill="#f3a9c0"/>
+    <circle cx="6.5" cy="-12" r="4.8" fill="#f3a9c0"/>
+    <circle cx="-2.5" cy="-15.5" r="5.4" fill="#f7bfd1"/>
+    <circle cx="3.2" cy="-16" r="5.2" fill="#f7bfd1"/>
+    <circle cx="0" cy="-12" r="4.6" fill="#f9cbda"/>
+    <circle cx="-3.5" cy="-17.5" r="1.6" fill="#ffffff" opacity="0.55"/>
+    <circle cx="4" cy="-13.5" r="1.3" fill="#ffffff" opacity="0.5"/>
+  </g>
+{% endmacro %}
+
+{# 夏祭りの提灯。2本の柱のあいだにたるませた縄へ紅白の提灯を下げる #}
+{% macro chochin_line(x1, x2, top=70, sag=4, n=4) %}
+  <g>
+    <path d="M{{ x1 }} 98 V{{ top - 2 }} M{{ x2 }} 98 V{{ top - 2 }}" stroke="#9a7650" stroke-width="1" stroke-linecap="round"/>
+    <path d="M{{ x1 }} {{ top }} Q{{ (x1 + x2) / 2 }} {{ top + sag * 2 }} {{ x2 }} {{ top }}" fill="none" stroke="#8a7a66" stroke-width="0.6"/>
+    {% for k in range(n) %}
+      {% set t = (k + 1) / (n + 1) %}
+      {% set lx = x1 + (x2 - x1) * t %}
+      {% set ly = top + 4 * sag * t * (1 - t) %}
+      {% set body = "#ec6a5c" if k % 2 == 0 else "#fff4e2" %}
+      <g transform="translate({{ lx }} {{ ly }}) scale(0.7)">
+        <path d="M0 0 V1.5" stroke="#8a7a66" stroke-width="0.5"/>
+        <rect x="-2" y="1.5" width="4" height="1.3" rx="0.4" fill="#4a3a32"/>
+        <ellipse cy="6.6" rx="3.6" ry="4.4" fill="{{ body }}"/>
+        <path d="M-3.4 5.2 H3.4 M-3.4 8 H3.4" stroke="{{ '#d4544a' if k % 2 == 0 else '#f0c9b8' }}" stroke-width="0.4"/>
+        {% if k % 2 == 1 %}<circle cy="6.6" r="1.3" fill="#ec6a5c"/>{% endif %}
+        <rect x="-2" y="10.4" width="4" height="1.3" rx="0.4" fill="#4a3a32"/>
+        <path d="M0 11.7 V13.3" stroke="#e6b450" stroke-width="0.6"/>
+      </g>
+    {% endfor %}
+  </g>
+{% endmacro %}
+
 <svg class="scenery season-{{ season }}" viewBox="0 0 1200 112" preserveAspectRatio="xMidYMax slice">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -128,14 +165,56 @@
   <ellipse cx="660" cy="93" rx="56" ry="5" fill="{{ pal.pond }}"/>
   <ellipse cx="612" cy="92" rx="6" ry="3" fill="#9a9a8f"/>
 
-  {{ tree(728, 89, 1.1) }}
-  {{ tree(746, 90, 0.85) }}
-  {{ tree(120, 88, 1.1) }}
-  {{ tree(250, 86) }}
-  {{ tree(345, 89, 0.9) }}
-  {{ tree(880, 86, 1.1) }}
-  {{ tree(1000, 88) }}
-  {{ tree(1120, 87, 1.1) }}
+  {% if season == "spring" %}
+    {# 数本ずつまとめて間をあける。おじいちゃんとおばあちゃんが着く中尊寺の前と、毛越寺・大泉が池の前はあける #}
+    {% for x in [14, 40, 66, 128, 154, 180, 250, 276, 344, 370, 396, 556, 580,
+                 744, 770, 834, 860, 886, 960, 986, 1050, 1076, 1102, 1166, 1192] %}
+      {{ sakura_tree(x, [1.0, 0.9, 1.08][loop.index0 % 3]) }}
+    {% endfor %}
+  {% else %}
+    {{ tree(728, 89, 1.1) }}
+    {{ tree(746, 90, 0.85) }}
+    {{ tree(120, 88, 1.1) }}
+    {{ tree(250, 86) }}
+    {{ tree(345, 89, 0.9) }}
+    {{ tree(880, 86, 1.1) }}
+    {{ tree(1000, 88) }}
+    {{ tree(1120, 87, 1.1) }}
+  {% endif %}
+  {% if season == "summer" %}
+    {{ chochin_line(146, 230, n=7) }}
+    {{ chochin_line(270, 330, n=5) }}
+    {{ chochin_line(900, 985, n=7) }}
+    {{ chochin_line(1015, 1100, n=7) }}
+
+  <!-- お神輿をかついで練り歩く人たち -->
+  <g id="mikoshi" style="transform: translateX(-300px)">
+    <g transform="translate(0 99)">
+      <g class="mikoshi-bob">
+        {% for px in [3, 10, 30, 37] %}
+          <g transform="translate({{ px }} 0)"><g class="mikoshi-man" style="animation-delay: -{{ loop.index0 * 0.15 }}s">
+            <path class="mikoshi-leg" d="M-0.6 -4.8 V0" stroke="#2f3b55" stroke-width="1.1" stroke-linecap="round"/>
+            <path class="mikoshi-leg back" d="M0.6 -4.8 V0" stroke="#2f3b55" stroke-width="1.1" stroke-linecap="round"/>
+            <path d="M-2.2 -9.5 H2.2 L2 -4.2 H-2 Z" fill="#3e5f96"/>
+            <path d="M-0.9 -9.5 L0 -7 L0.9 -9.5" fill="none" stroke="#ffffff" stroke-width="0.5"/>
+            <rect x="-2.1" y="-5.4" width="4.2" height="0.9" fill="#e9c35a"/>
+            <circle cy="-11.4" r="1.9" fill="#f1cfaa"/>
+            <path d="M-1.9 -12.4 H1.9" stroke="#ffffff" stroke-width="0.7"/>
+          </g></g>
+        {% endfor %}
+        <g class="mikoshi-shrine">
+          <rect x="0" y="-10.4" width="40" height="1.1" rx="0.5" fill="#8a5a3c"/>
+          <rect x="13" y="-13" width="14" height="2.6" fill="#7a2f2a"/>
+          <rect x="14.5" y="-19" width="11" height="6" fill="#e0b23a"/>
+          <rect x="17.5" y="-18" width="5" height="4" fill="#c4442f"/>
+          <path d="M11 -19 Q16 -20 18 -24 H22 Q24 -20 29 -19 Z" fill="#3f3f46"/>
+          <path d="M11 -19 Q16 -20 18 -24 H22 Q24 -20 29 -19" fill="none" stroke="#e0b23a" stroke-width="0.5"/>
+          <path d="M20 -24 V-25.6 M18.6 -26.6 Q20 -28.6 21.4 -26.6 Q20 -25.4 18.6 -26.6Z" stroke="#e0b23a" stroke-width="0.6" fill="#e0b23a"/>
+        </g>
+      </g>
+    </g>
+  </g>
+  {% endif %}
 
   <!-- 道とコミュニティバス -->
   <rect x="0" y="100" width="1200" height="12" fill="{{ '#e4e9ee' if season == 'winter' else '#e6d8bd' }}"/>

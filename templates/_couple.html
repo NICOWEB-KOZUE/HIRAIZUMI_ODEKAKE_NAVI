@@ -1,8 +1,12 @@
-<svg class="couple" viewBox="0 0 108 64" aria-hidden="true">
+{% set winter = season == "winter" %}
+{% set spring = season == "spring" %}
+{% set summer = season == "summer" %}
+<svg class="couple{{ ' winter' if winter }}{{ ' spring' if spring }}{{ ' summer' if summer }}" viewBox="0 0 108 64" aria-hidden="true">
   <g class="person grandma">
     <g class="side">
       <g class="limb arm arm-back" style="transform-origin: 28px 27px">
         <path d="M28 27 V38"/>
+        {% if summer %}<path class="sleeve" d="M28 27 V31.5"/>{% endif %}
         <circle class="hand" cx="28" cy="39.5" r="2.2"/>
       </g>
       <g class="limb leg leg-back" style="transform-origin: 28px 40px">
@@ -21,35 +25,90 @@
         </g>
       </g>
       <g class="limb arm arm-front" style="transform-origin: 28px 27px">
+        {% if summer %}
+        <path d="M28 27 L44 16"/>
+        <path class="sleeve" d="M28 27 L34 23"/>
+        <circle class="hand" cx="44" cy="16" r="2.2"/>
+        {% else %}
         <path d="M28 27 V38"/>
         <circle class="hand" cx="28" cy="39.5" r="2.2"/>
+        {% endif %}
       </g>
       <circle class="head" cx="30" cy="16" r="10"/>
       <path class="hair" d="M20 17 Q20 5 30 5 Q40 5 40 15 Q38 7 30 7 Q22 7 20 15Z"/>
       <circle class="bun" cx="18.5" cy="16" r="4.6"/>
       <circle class="eye" cx="34.5" cy="15.5" r="1.15"/>
       <path class="smile" d="M32.5 19.5 Q34.8 21.4 37 19.5"/>
+      {% if spring %}
+      <path class="spring-hat" d="M21 13 Q20 4 30 3.5 Q40 4 39 13 Q35 10 30 10 Q25 10 21 13 Z"/>
+      <ellipse class="spring-brim" cx="33" cy="12" rx="13" ry="2.2"/>
+      <path class="spring-band" d="M21.4 12.2 Q30 9.6 38.6 12.2 L38.4 10.6 Q30 8.4 21.6 10.6 Z"/>
+      {% endif %}
+      {% if winter %}
+      <path class="hat" d="M19.5 15 Q19 4 30 4 Q41 4 40.5 15Z"/>
+      <path class="hat-band" d="M19 15.5 Q30 11.5 41 15.5 L41 12.5 Q30 9 19 12.5Z"/>
+      <circle class="pompom" cx="30" cy="3" r="3"/>
+      <path class="scarf" d="M21 24.5 Q28 28.5 37 24.5 L37 27.5 Q28 31.5 21 27.5Z M22 26 L19 35 L22.5 35.5 L24.5 27Z"/>
+      {% endif %}
+      {% if summer %}
+      <g class="parasol">
+        <path class="canopy" d="M26 6 Q44 -8 62 6 Q44 2 26 6 Z"/>
+        <path class="rib" d="M44 -4 L28 5 M44 -4 L44 3 M44 -4 L60 5"/>
+        <circle class="knob" cx="44" cy="-4.6" r="1.6"/>
+        <path class="handle" d="M44 3 V16"/>
+      </g>
+      {% endif %}
     </g>
     <g class="front">
       <path class="front-leg" d="M24.5 40 V56 M31.5 40 V56"/>
       <ellipse class="shoe" cx="23.8" cy="57" rx="3.4" ry="2"/>
       <ellipse class="shoe" cx="32.2" cy="57" rx="3.4" ry="2"/>
       <path class="body" d="M18 28 Q16 40 20 42 H36 Q40 40 38 28 Q34 24 28 24 Q22 24 18 28Z"/>
+      {% if spring %}<path class="inner" d="M25.4 26.2 Q28 28.4 30.6 26.2 L31.4 41.2 H24.6 Z"/>{% endif %}
+      {% if summer %}
+      <path class="front-arm" d="M36.5 28 L39 38"/>
+      <path class="sleeve" d="M36.5 28 L37.5 32.2"/>
+      <circle class="hand" cx="39.3" cy="39.5" r="2.2"/>
+      <path class="front-arm" d="M19.5 28 L15 16"/>
+      <path class="sleeve" d="M19.5 28 L18 24"/>
+      <circle class="hand" cx="15" cy="16" r="2.2"/>
+      {% else %}
       <path class="front-arm" d="M19.5 28 L17 38 M36.5 28 L39 38"/>
       <circle class="hand" cx="16.7" cy="39.5" r="2.2"/>
       <circle class="hand" cx="39.3" cy="39.5" r="2.2"/>
+      {% endif %}
       <circle class="bun" cx="28" cy="5.5" r="4.4"/>
       <circle class="head" cx="28" cy="16" r="10"/>
       <path class="hair" d="M18 17 Q18 6 28 6 Q38 6 38 17 Q36 9 28 9 Q20 9 18 17Z"/>
       <circle class="eye" cx="24.5" cy="16" r="1.15"/>
       <circle class="eye" cx="31.5" cy="16" r="1.15"/>
       <path class="smile" d="M24.8 20 Q28 22.6 31.2 20"/>
+      {% if spring %}
+      <path class="spring-hat" d="M19 12.5 Q18 2.5 28 2 Q38 2.5 37 12.5 Q33 9.5 28 9.5 Q23 9.5 19 12.5 Z"/>
+      <ellipse class="spring-brim" cx="28" cy="12" rx="14" ry="2.2"/>
+      <path class="spring-band" d="M19.4 11.8 Q28 9 36.6 11.8 L36.4 10.2 Q28 7.8 19.6 10.2 Z"/>
+      {% endif %}
+      {% if winter %}
+      <path class="hat" d="M17.5 15 Q17 4 28 4 Q39 4 38.5 15Z"/>
+      <path class="hat-band" d="M17 15.5 Q28 11.5 39 15.5 L39 12.5 Q28 9 17 12.5Z"/>
+      <circle class="pompom" cx="28" cy="3" r="3"/>
+      <path class="scarf" d="M19 24.5 Q28 28.5 37 24.5 L37 27.5 Q28 31.5 19 27.5Z M31 27.5 L32.5 37 L35.5 36.5 L34 27Z"/>
+      {% endif %}
+      {% if summer %}
+      <g class="parasol">
+        <path class="canopy" d="M-3 2 Q15 -12 33 2 Q15 -2 -3 2 Z"/>
+        <path class="rib" d="M15 -8 L-1 1 M15 -8 L15 0 M15 -8 L31 1"/>
+        <circle class="knob" cx="15" cy="-8.6" r="1.6"/>
+        <path class="handle" d="M15 0 V16"/>
+      </g>
+      {% endif %}
     </g>
   </g>
   <g class="person grandpa">
     <g class="side">
       <g class="limb arm arm-back" style="transform-origin: 73px 25px">
         <path d="M73 25 V37"/>
+        {% if summer %}<path class="sleeve" d="M73 25 V29.5"/>{% endif %}
         <circle class="hand" cx="73" cy="38.5" r="2.3"/>
       </g>
       <g class="limb leg leg-back" style="transform-origin: 73px 39px">
@@ -69,6 +128,7 @@
       </g>
       <g class="limb arm arm-front" style="transform-origin: 73px 25px">
         <path d="M73 25 V37"/>
+        {% if summer %}<path class="sleeve" d="M73 25 V29.5"/>{% endif %}
         <circle class="hand" cx="73" cy="38.5" r="2.3"/>
       </g>
       <circle class="head" cx="74" cy="14" r="10.5"/>
@@ -77,13 +137,21 @@
       <ellipse class="brim" cx="78" cy="10.8" rx="12" ry="2"/>
       <circle class="eye" cx="79.5" cy="14" r="1.15"/>
       <path class="smile" d="M77.2 18 Q79.6 20 82.2 18"/>
+      {% if winter %}
+      <path class="hat" d="M63.2 13 Q63 1.5 74 1.5 Q85 1.5 84.8 13Z"/>
+      <path class="hat-band" d="M63 13.8 Q74 9.5 85 13.8 L85 10.5 Q74 6.5 63 10.5Z"/>
+      <circle class="pompom" cx="74" cy="0.5" r="3"/>
+      <path class="scarf" d="M65 23 Q74 27 83 23 L83 26 Q74 30 65 26Z M66 24.5 L63 33 L66.5 33.5 L68.5 25.5Z"/>
+      {% endif %}
     </g>
     <g class="front">
       <path class="front-leg" d="M69.5 39 V56 M76.5 39 V56"/>
       <ellipse class="shoe" cx="68.8" cy="57" rx="3.6" ry="2"/>
       <ellipse class="shoe" cx="77.2" cy="57" rx="3.6" ry="2"/>
       <path class="body" d="M62 26 Q60 38 64 41 H82 Q86 38 84 26 Q80 22 74 22 Q68 22 62 26Z"/>
+      {% if spring %}<path class="inner" d="M70 24.2 H76 L73 29.2 Z"/>{% endif %}
       <path class="front-arm" d="M63.5 26 L61 36.5 M83.5 26 L86 36.5"/>
+      {% if summer %}<path class="sleeve" d="M63.5 26 L62.5 30.2 M83.5 26 L84.5 30.2"/>{% endif %}
       <circle class="hand" cx="60.7" cy="38" r="2.3"/>
       <circle class="hand" cx="86.3" cy="38" r="2.3"/>
       <circle class="head" cx="73" cy="14.5" r="10.5"/>
@@ -93,6 +161,12 @@
       <circle class="eye" cx="69.5" cy="15.5" r="1.15"/>
       <circle class="eye" cx="76.5" cy="15.5" r="1.15"/>
       <path class="smile" d="M69.8 19.5 Q73 22.1 76.2 19.5"/>
+      {% if winter %}
+      <path class="hat" d="M62.2 13.5 Q62 2 73 2 Q84 2 83.8 13.5Z"/>
+      <path class="hat-band" d="M62 14.3 Q73 10 84 14.3 L84 11 Q73 7 62 11Z"/>
+      <circle class="pompom" cx="73" cy="1" r="3"/>
+      <path class="scarf" d="M63 23 Q73 27 83 23 L83 26 Q73 30 63 26Z M76 26 L77.5 35 L80.5 34.5 L79 26Z"/>
+      {% endif %}
     </g>
   </g>
 </svg>

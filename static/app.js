@@ -20,7 +20,7 @@ document.querySelectorAll(".footer-dog").forEach((dog) => {
   const targetLeft = () => {
     const t = temple.getBoundingClientRect();
     const f = footer.getBoundingClientRect();
-    const center = t.left + t.width / 2 - f.left + 40;
+    const center = t.left + t.width / 2 - f.left;
     return Math.max(4, Math.min(center - dog.offsetWidth / 2, f.width - dog.offsetWidth - 6));
   };
 
@@ -67,7 +67,7 @@ document.querySelectorAll(".footer-dog").forEach((dog) => {
   });
 });
 
-// 画面の下の景色: 東北本線の電車とコミュニティバスがときどき通る
+// 画面の下の景色: 東北本線の電車とコミュニティバスがときどき通る（夏はお神輿も練り歩く）
 const scenery = document.querySelector(".scenery");
 
 if (scenery && !reduceMotion) {
@@ -99,6 +99,7 @@ if (scenery && !reduceMotion) {
 
   drive(scenery.querySelector("#train"), { direction: -1, speed: 70, firstDelay: 1500, gap: [5000, 11000] });
   drive(scenery.querySelector("#bus"), { direction: 1, speed: 30, firstDelay: 3500, gap: [4000, 9000] });
+  drive(scenery.querySelector("#mikoshi"), { direction: 1, speed: 12, firstDelay: 0, gap: [3000, 6000] });
 }
 
 // おでかけの道のり: おじいちゃんとおばあちゃんが家から行き先まで歩く
